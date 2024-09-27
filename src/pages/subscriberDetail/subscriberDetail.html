@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="subscriberDetail.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+    <script type="module">
+
+        const body = document.getElementsByTagName('body')[0];
+
+        const formatDate = (date) => {
+            return new Date(date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })
+        }
+
+        const subscriberOptions = (sub) => {
+
+            body.innerHTML += `
+                <div class="subscriber-options">
+                    <button class="btn" id="btn-edit"><i class="fa-regular fa-pen-to-square"></i> Modificar monto</button>
+                    ${sub.status == 'authorized' ? '<button class="btn" id="btn-pause"><i class="fa-regular fa-clock"></i> Pausar</button>' : ''}
+                    ${sub.status != 'authorized' ? '<button class="btn" id="btn-resume"><i class="fa-regular fa-circle-xmark" style="transform: rotateZ(45deg)"></i> Reanudar</button>' : ''}
+                    <button class="btn" id="btn-cancel"><i class="fa-regular fa-circle-xmark"></i> Cancelar</button>
+                </div>
+            `
+            const btnEdit = document.getElementById('btn-edit')
+            const btnPause = document.getElementById('btn-pause')
+            const btnResume = sub.status != 'authorized' && document.getElementById('btn-resume')
+            const btnCancel = document.getElementById('btn-cancel')
+
+            btnEdit.addEventListener('click', () => window.electronAPI.openViewEditAmount(sub))
+        }
+
+        const generateView = async (args) => {
+            body.innerHTML = '';
+
+            const { id, payer_first_name, payer_last_name } = args
+
+            document.title = `Detalle de ${payer_first_name} ${payer_last_name}`;
+
+            body.innerHTML += `
+            <div id="container-subscription-data"><div class="loading"></div></div>
+        `;
+
+            try {
+                const sub = await window.electronAPI.getSubscriberDetail(id);
+                const { summarized } = sub;
+
+                // Ahora que tienes los datos, puedes reemplazar el contenido
+                const subscriptionData = document.getElementById('container-subscription-data');
+                subscriptionData.innerHTML = `
+                    <h2>${payer_first_name} ${payer_last_name}</h2>
+                    <p style="font-size: 20px; font-weight: 600;">Paga ${sub.auto_recurring.transaction_amount ? '$' + sub.auto_recurring.transaction_amount : '-'}</p>
+                    <ul class="subscription-data">
+                        <li>Fecha de adhesión <span>${formatDate(sub.date_created)}</span></li>
+                        <li>Pagos recibidos <span>${summarized.charged_quantity}</span></li>
+                        <li>Fecha de facturación  <span>Día ${formatDate(summarized.last_charged_date).split(' ')[0]}</span></li>
+                        <li>Fecha del último pago <span>${formatDate(summarized.last_charged_date)}</span></li>
+                        <li>Último pago <span>$${summarized.last_charged_amount}</span></li>
+                        <li>Fecha del próximo pago <span>${formatDate(sub.next_payment_date)}</span></li>
+                        ${summarized.pending_charge_quantity ? '<li>Cantidad de pagos pendientes <span>' + summarized.pending_charge_quantity + '</span></li>' : ''}
+                        ${summarized.pending_charge_quantity ? '<li>Cantidad de pagos pendientes <span>$' + summarized.pending_charge_amount + '</span></li>' : ''}
+                    </ul >
+                `;
+
+                subscriberOptions(args)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        window.electronAPI.updateViewSubscribedDetail((_,args) => generateView(args));
+
+        window.electronAPI.onReceiveSubscriberId((_, args) => generateView(args));
+        
+    </script>
+</body>
+
+</html>

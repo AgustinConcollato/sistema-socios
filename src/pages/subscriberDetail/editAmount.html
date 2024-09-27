@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar monto</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body style="padding: 20px;">
+
+    <h2>Modificar monto</h2>
+
+
+    <script type="module">
+        window.electronAPI.onReceiveSubscriberId((_, sub) => {
+
+            const body = document.getElementsByTagName('body')[0];
+
+            document.title = `Modificar monto de ${sub.payer_first_name} ${sub.payer_last_name}`
+
+            body.innerHTML += `<p>Se le avisará a <strong>${sub.payer_first_name} ${sub.payer_last_name}</strong> que el precio fue actualizado</p>`
+            body.innerHTML += `
+                <form id="form-new-amount">
+                    <div style="margin-top: 20px">
+                    <input type="number" placeholder="Ingresar nuevo monto" required>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-direction:row;">
+                        <button class="btn" type="button" id="btn-cancel">Cancelar</button>
+                        <button class="btn" style="color: #fff; background: #385f99;" type="submit">Modificar</button>
+                        <div id="loading" style="visibility: hidden; margin:0;" class="loading"></div>
+                    </div>
+                </form>
+            `
+            const btnCancel = document.getElementById('btn-cancel')
+            const formNewAmount = document.getElementById('form-new-amount')
+            const loading = document.getElementById('loading');
+
+            btnCancel.addEventListener('click', () => window.close())
+
+            formNewAmount.addEventListener('submit', async (e) => {
+                e.preventDefault()
+                const newAmount = e.target[0].value;
+
+                loading.style.visibility = 'visible';
+                e.target[1].style.display = 'none';
+                e.target[2].style.display = 'none';
+
+                try {
+                    const response = await window.electronAPI.updateSubscriberAmount({ id: sub.id, newAmount });
+                    if(response.auto_recurring.transaction_amount == newAmount){
+                        window.electronAPI.notifySubscriberDetailUpdate(response);
+                        window.close()
+                    } 
+                } catch (error) {
+                    console.log(error)
+                }
+                finally {
+                    loading.style.visibility = 'hidden';
+                    e.target[1].style.display = 'block';
+                    e.target[2].style.display = 'block';
+                }
+            })
+
+        });
+    </script>
+</body>
+
+</html>

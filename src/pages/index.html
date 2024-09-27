@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sistema de socios</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./css/nav.css">
+  <link rel="stylesheet" href="./css/header.css">
+  <link rel="stylesheet" href="./css/partnerList.css">
+  <link rel="stylesheet" href="./css/partnerPayments.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+  <nav>
+    <div class="container-logo">
+      <img src="../assets/img/logo.png" />
+    </div>
+    <ul>
+      <li><a href='#'>Socios</a></li>
+      <li><a href='./debitAutomatic/debitAutomatic.html'>Débito automático</a></li>
+      <li><a href='./payroll/payroll.html'>Planillas</a></li>
+    </ul>
+  </nav>
+  <main>
+    <header>
+      <div class="searcher">
+        <label for="search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </label>
+        <input type="text" id="search" placeholder="Buscar por nombre, apellido o número de socio" />
+        <div class="response"></div>
+      </div>
+      <button class='btn' id="newPartner">+ Nuevo socio</button>
+    </header>
+    <section>
+      <h1>Socios</h1>
+      <div class="filters">
+        <div>
+          <span>Lugar de pago</span>
+          <div class="container-select">
+            <select id="collect">
+              <option value="1">Secretaría parroquial</option>
+              <option value="2">Cobrador</option>
+            </select>
+            <i class="fa-solid fa-angle-down"></i>
+          </div>
+        </div>
+        <div>
+          <span>Estado</span>
+          <div class="container-select">
+            <select id="status">
+              <option value="active">Activo</option>
+              <option value="pause">Pausado</option>
+            </select>
+            <i class="fa-solid fa-angle-down"></i>
+          </div>
+        </div>
+      </div>
+      <div class="container-main">
+        <div id="letter-sidebar">
+        </div>
+        <div id="partner-list">
+        </div>
+        <div id="partner-payments">
+          <h4>Agustín Concollato</h4>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      let partnerList = [];
+      let collect = 1;
+      let status = 'active';
+
+      const containerPartnerList = document.getElementById('partner-list');
+      const partnerPaymentsContainer = document.getElementById('partner-payments');
+      const collectSelect = document.getElementById('collect');
+      const statusSelect = document.getElementById('status');
+
+      const getPartners = async ({ collect, status }) => {
+        try {
+          const results = await window.electronAPI.getPartners({ collect, status });
+          partnerList = results;
+          renderPartnerList();
+          renderLetterSidebar();
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      const getAvailableLetters = (partnerList) => {
+        const letters = partnerList.map(partner => partner.name[0].toUpperCase());
+        return [...new Set(letters)].sort();
+      };
+
+      const scrollToPartner = (letter) => {
+        const partnerRow = document.querySelector(`[data-letter="${letter}"]`);
+        if (partnerRow) {
+          const headerOffset = 90; // Ajusta este valor según el tamaño de tu header o cualquier elemento fijo.
+          const elementPosition = partnerRow.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth"
+          });
+        }
+      };
+
+      const renderLetterSidebar = () => {
+        const availableLetters = getAvailableLetters(partnerList);
+        const letterContainer = document.getElementById('letter-sidebar');
+        letterContainer.innerHTML = '';
+
+        availableLetters.forEach(letter => {
+          const letterElement = document.createElement('div');
+          letterElement.innerText = letter;
+          letterElement.classList.add('letter-item');
+          letterElement.addEventListener('click', () => scrollToPartner(letter));
+          letterContainer.appendChild(letterElement);
+        });
+      };
+
+      const renderPartnerList = () => {
+        containerPartnerList.innerHTML = '';
+
+        if (partnerList.length === 0) {
+          containerPartnerList.innerHTML = `<p style="padding: 40px 20px; font-size: 18px">No hay socios${status == 'active' ? ' activos ' : ' pausados '} ${collect == 1 ? 'de secretaría parroquial' : 'del cobrador'}</p>`;
+        } else {
+
+          containerPartnerList.innerHTML = `
+          <table class="partners-table" cellspacing="0">
+            <thead>
+              <tr>
+                <td>Socio</td>
+                <td>Último pago</td>
+                <td>Pago del mes</td>
+                <td>Opciones</td>
+              </tr>
+            </thead>
+            <tbody id="partner-table-body">
+            </tbody>
+          </table>
+          `
+          const partnerTableBody = document.getElementById('partner-table-body');
+          partnerTableBody.innerHTML = '';
+
+          const today = new Date()
+
+          let previousLetter = ''
+
+          partnerList.forEach((e, i) => {
+
+            const firstLetter = e.name[0].toUpperCase();
+
+            previousLetter = i != 0 ? partnerList[i - 1].name[0].toUpperCase() : e.name[0].toUpperCase()
+
+
+            const last_payment = e.last_payment_date ? new Date(e.last_payment_date).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) : 'No realizó pagos'
+
+            const paymentDate = new Date(e.last_payment_date);
+
+            const paymentYear = paymentDate.getFullYear();
+            const paymentMonth = paymentDate.getMonth();
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth();
+
+            partnerTableBody.innerHTML += ` 
+              <tr data-letter="${(firstLetter != previousLetter || i == 0) ? firstLetter : '-'}">
+                <td title="${e.name}">
+                  <h4>${e.name}</h4>
+                  <p>Número de socio: ${e.member_number}</p>        
+                </td>
+                <td>
+                  ${e.last_payment_amount ? `<h4>${e.last_payment_amount}</h4>` : ''}
+                  <p>${last_payment}</p>
+                </td>
+                <td>
+                  <span>
+                    ${((paymentYear === currentYear) && (paymentMonth === currentMonth)) ? last_payment : 'No realizado'}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn" data-id="${e.member_number}"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+                  <div class="partner-options" id="options-${e.member_number}" style="display: none;">
+                    <button><i class="fa-regular fa-pen-to-square"></i> Editar datos</button>
+                    <button><i class="fa-regular fa-file"></i> Generar planilla</button>
+                    <button><i class="fa-regular fa-clock"></i> Pausar</button>
+                    <button><i class="fa-regular fa-circle-xmark"></i> Cancelar</button>
+                  </div>
+                </td>
+              </tr>
+            `
+
+          });
+
+          document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+              const memberId = event.target.closest('.btn').getAttribute('data-id');
+              const optionsDiv = document.getElementById(`options-${memberId}`);
+              const icon = event.target.closest('.btn').querySelector('i');
+
+              // Alternar visibilidad del menú de opciones
+              if (optionsDiv.style.display === 'none') {
+                closeAllMenus(); // Cierra otros menús abiertos
+                optionsDiv.style.display = 'block';
+                icon.classList.remove('fa-ellipsis-vertical');
+                icon.classList.add('fa-xmark'); // Cambiar el icono a "X"
+              } else {
+                optionsDiv.style.display = 'none';
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-ellipsis-vertical'); // Cambiar el icono a elipsis
+              }
+            });
+          });
+
+          // Función para cerrar todos los menús abiertos
+          const closeAllMenus = () => {
+            document.querySelectorAll('.partner-options').forEach(option => {
+              option.style.display = 'none';
+            });
+            document.querySelectorAll('.btn i').forEach(icon => {
+              icon.classList.remove('fa-xmark');
+              icon.classList.add('fa-ellipsis-vertical');
+            });
+          };
+
+          // Cerrar el menú si se hace clic fuera
+          document.addEventListener('click', (event) => {
+            if (!event.target.closest('.btn') && !event.target.closest('.partner-options')) {
+              closeAllMenus();
+            }
+          });
+        }
+
+      };
+
+      const loadPartnerPayments = (partnerId) => {
+        // Simulación de carga de pagos
+        partnerPaymentsContainer.textContent = `Cargando pagos del socio ${partnerId}...`;
+
+        setTimeout(() => {
+          partnerPaymentsContainer.textContent = `Pagos cargados para el socio ${partnerId}`;
+        }, 1000);
+      };
+
+      collectSelect.addEventListener('change', (e) => {
+        collect = e.target.value;
+        getPartners({ collect, status });
+      });
+
+      statusSelect.addEventListener('change', (e) => {
+        status = e.target.value;
+        getPartners({ collect, status });
+      });
+
+      window.electronAPI.updatePartnerList((_, collectValue) => {
+        collect = collectValue;
+        collectSelect.value = collect;
+        getPartners({ collect, status });
+      });
+
+      getPartners({ collect, status });
+
+    });
+
+  </script>
+  <script src="../scripts/openViewNewPartner.js"></script>
+</body>
+
+</html>

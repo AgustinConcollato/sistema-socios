@@ -1,0 +1,84 @@
+body {
+    padding: 20px 20px 80px 20px;
+    display: block;
+}
+
+h3 {
+    font-weight: 600;
+}
+
+form>div {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+form>div input {
+    border-radius: 5px;
+    padding: 10px 15px;
+    background: #f0f0f0;
+    border: none;
+    margin-top: 5px;
+}
+
+form>div input:focus {
+    outline-color: #385f99;
+}
+
+.form-adress {
+    display: flex;
+    gap: 10px;
+    flex-direction: row;
+}
+
+.form-name>div {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-adress>div {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.options-collect span {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.options-collect>div {
+    display: flex;
+}
+
+.options-collect input {
+    margin: 0;
+}
+
+.options-collect label {
+    padding: 0 10px 0 20px;
+    cursor: pointer;
+}
+
+.container-btn-form {
+    flex-direction: row;
+    gap: 10px;
+    margin: 0;
+    width: 100%;
+    position: fixed;
+    justify-content: end;
+    bottom: 0;
+    right: 0;
+    padding: 10px 20px 20px 0;
+    height: 70px;
+    background: #fff;
+}
+
+.container-btn-form button:first-child {
+    color: #385f99;
+}
+
+.container-btn-form button:last-child {
+    background: #385f99;
+    color: #fff;
+}

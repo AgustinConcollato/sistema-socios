@@ -1,0 +1,39 @@
+#container-subscription-data {
+    max-width: 600px;
+    width: 100%;
+}
+
+.subscription-data {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.subscription-data li {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.subscription-data li div {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+}
+
+.subscription-data li span {
+    font-weight: 600;
+}
+
+.subscriber-options {
+    margin-top: 60px;
+    display: flex;
+    gap: 10px;
+
+}
+
+.subscriber-options .btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

@@ -1,0 +1,7 @@
+#partner-payments {
+    min-width: 330px;
+    position: sticky;
+    top: 100px;
+    outline: auto;
+    display: none;
+}

@@ -1,0 +1,1 @@
+document.getElementById('newPartner').onclick = () => window.electronAPI.openViewAddPartner();

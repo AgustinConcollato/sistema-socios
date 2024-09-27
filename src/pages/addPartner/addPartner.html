@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'none';">
+    <title>formulario agregar socio</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="addPartner.css">
+</head>
+
+<body>
+    <header>
+        <h3>Agregar socio</h3>
+        <p>Los campos con (*) son obligatorios</p>
+    </header>
+    <form id="form-add-partner">
+        <div>
+            <label for="name">Nombre y Apellido *</label>
+            <input type="text" name="name" id="name" required placeholder="Nombre y Apellido">
+        </div>
+        <div class="form-adress">
+            <div>
+                <label for="address">Dirección *</label>
+                <input type="text" name="address" id="address" required placeholder="Dirección">
+            </div>
+            <div>
+                <label for="neighborhood">Barrio</label>
+                <input type="text" name="neighborhood" id="neighborhood" placeholder="Barrio">
+            </div>
+        </div>
+        <div>
+            <label for="contact">Contacto</label>
+            <input type="text" name="contact" id="contact" placeholder="Correo electrónico / Teléfono">
+        </div>
+        <div class="options-collect">
+            <div>
+                <span>Forma o lugar de cobro *</span>
+            </div>
+            <div>
+                <input type="radio" name="collect" value="1" id="collect1" required>
+                <label for="collect1">Secretaría parroquial</label>
+            </div>
+            <div>
+                <input type="radio" name="collect" value="2" id="collect2">
+                <label for="collect2">Cobrador</label>
+            </div>
+        </div>
+        <div class="container-btn-form">
+            <button type="reset" class="btn" tabindex="1">Vaciar formulario</button>
+            <button type="submit" class="btn" tabindex="0">Agregar</button>
+        </div>
+    </form>
+    <script type="module" src="./index.js"></script>
+</body>
+
+</html>
