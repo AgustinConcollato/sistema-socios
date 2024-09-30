@@ -1,8 +1,10 @@
 const { ipcMain } = require("electron");
 const db = require('../utils/database');
+const { generateId } = require('./generateId')
 
 ipcMain.handle('add-partner', async (event, args) => {
-    const { id, name, address, collect, neighborhood, contact, date } = args;
+    const { name, address, collect, neighborhood, contact, date } = args;
+    const id = generateId()
 
     const sql = 'INSERT INTO partner (id, name, address, collect, neighborhood, contact, date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 

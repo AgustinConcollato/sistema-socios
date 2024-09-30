@@ -102,6 +102,8 @@ app.on('ready', () => {
     require('./utils/database')
     require('./utils/addPartner')
     require('./utils/getPartner')
+    require('./utils/getPartnerPayments')
+    require('./utils/addPayment')
     require('./utils/subscriptionMP')
 });
 

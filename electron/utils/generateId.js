@@ -1,5 +1,4 @@
-
-export const generateId = () => {
+const generateId = () => {
     const a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     const id = []
 
@@ -8,3 +7,5 @@ export const generateId = () => {
     }
     return id.join('')
 }
+
+module.exports = { generateId }

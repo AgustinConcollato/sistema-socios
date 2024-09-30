@@ -13,6 +13,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="../scripts/addPayment.js"></script>
+  <script src="../scripts/formatNumber.js"></script>
 </head>
 
 <body>
@@ -62,12 +64,9 @@
         </div>
       </div>
       <div class="container-main">
-        <div id="letter-sidebar">
-        </div>
         <div id="partner-list">
         </div>
         <div id="partner-payments">
-          <h4>Agustín Concollato</h4>
         </div>
       </div>
     </section>
@@ -75,6 +74,8 @@
   </main>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      const currentdate = new Date()
+
       let partnerList = [];
       let collect = 1;
       let status = 'active';
@@ -85,47 +86,16 @@
       const statusSelect = document.getElementById('status');
 
       const getPartners = async ({ collect, status }) => {
+        partnerPaymentsContainer.innerHTML = ''
+        partnerPaymentsContainer.style.display = 'none'
+
         try {
           const results = await window.electronAPI.getPartners({ collect, status });
           partnerList = results;
           renderPartnerList();
-          renderLetterSidebar();
         } catch (error) {
           console.log(error);
         }
-      };
-
-      const getAvailableLetters = (partnerList) => {
-        const letters = partnerList.map(partner => partner.name[0].toUpperCase());
-        return [...new Set(letters)].sort();
-      };
-
-      const scrollToPartner = (letter) => {
-        const partnerRow = document.querySelector(`[data-letter="${letter}"]`);
-        if (partnerRow) {
-          const headerOffset = 90; // Ajusta este valor según el tamaño de tu header o cualquier elemento fijo.
-          const elementPosition = partnerRow.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: "smooth"
-          });
-        }
-      };
-
-      const renderLetterSidebar = () => {
-        const availableLetters = getAvailableLetters(partnerList);
-        const letterContainer = document.getElementById('letter-sidebar');
-        letterContainer.innerHTML = '';
-
-        availableLetters.forEach(letter => {
-          const letterElement = document.createElement('div');
-          letterElement.innerText = letter;
-          letterElement.classList.add('letter-item');
-          letterElement.addEventListener('click', () => scrollToPartner(letter));
-          letterContainer.appendChild(letterElement);
-        });
       };
 
       const renderPartnerList = () => {
@@ -152,53 +122,108 @@
           const partnerTableBody = document.getElementById('partner-table-body');
           partnerTableBody.innerHTML = '';
 
-          const today = new Date()
-
-          let previousLetter = ''
-
           partnerList.forEach((e, i) => {
-
-            const firstLetter = e.name[0].toUpperCase();
-
-            previousLetter = i != 0 ? partnerList[i - 1].name[0].toUpperCase() : e.name[0].toUpperCase()
-
-
             const last_payment = e.last_payment_date ? new Date(e.last_payment_date).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) : 'No realizó pagos'
 
             const paymentDate = new Date(e.last_payment_date);
 
             const paymentYear = paymentDate.getFullYear();
             const paymentMonth = paymentDate.getMonth();
-            const currentYear = today.getFullYear();
-            const currentMonth = today.getMonth();
+            const currentYear = currentdate.getFullYear();
+            const currentMonth = currentdate.getMonth();
 
-            partnerTableBody.innerHTML += ` 
-              <tr data-letter="${(firstLetter != previousLetter || i == 0) ? firstLetter : '-'}">
-                <td title="${e.name}">
-                  <h4>${e.name}</h4>
-                  <p>Número de socio: ${e.member_number}</p>        
-                </td>
-                <td>
-                  ${e.last_payment_amount ? `<h4>${e.last_payment_amount}</h4>` : ''}
+            const tr = document.createElement('tr');
+
+            // Crear y configurar la primera columna
+            const tdName = document.createElement('td');
+            tdName.setAttribute('data-id', e.id);
+            tdName.title = e.name;
+
+            const h4Name = document.createElement('h4');
+            h4Name.innerText = e.name;
+
+            const pMemberNumber = document.createElement('p');
+            pMemberNumber.innerText = `Número de socio: ${e.member_number}`;
+
+            tdName.appendChild(h4Name);
+            tdName.appendChild(pMemberNumber);
+
+            // Crear y configurar la segunda columna (monto y último pago)  
+            const tdPayment = document.createElement('td');
+            tdPayment.setAttribute('data-id', e.id);
+
+            if (e.last_payment_amount) {
+              const h4Amount = document.createElement('h4');
+              h4Amount.innerText = '$' + formatNumber(e.last_payment_amount);
+              tdPayment.appendChild(h4Amount);
+            }
+
+            const pLastPayment = document.createElement('p');
+            pLastPayment.innerText = last_payment;
+            tdPayment.appendChild(pLastPayment);
+
+            // Crear y configurar la tercera columna (estado del pago)
+            const tdPaymentStatus = document.createElement('td');
+            tdPaymentStatus.setAttribute('data-id', e.id);
+
+            if ((paymentYear === currentYear) && (paymentMonth === currentMonth)) {
+              tdPaymentStatus.innerHTML = `
+                  <h4>$${formatNumber(e.last_payment_amount)}</h4>
                   <p>${last_payment}</p>
-                </td>
-                <td>
-                  <span>
-                    ${((paymentYear === currentYear) && (paymentMonth === currentMonth)) ? last_payment : 'No realizado'}
-                  </span>
-                </td>
-                <td>
-                  <button class="btn" data-id="${e.member_number}"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                  <div class="partner-options" id="options-${e.member_number}" style="display: none;">
-                    <button><i class="fa-regular fa-pen-to-square"></i> Editar datos</button>
-                    <button><i class="fa-regular fa-file"></i> Generar planilla</button>
-                    <button><i class="fa-regular fa-clock"></i> Pausar</button>
-                    <button><i class="fa-regular fa-circle-xmark"></i> Cancelar</button>
-                  </div>
-                </td>
-              </tr>
-            `
+                `
+            } else {
+              tdPaymentStatus.innerHTML = `<span>No realizado</span>`
+            }
 
+            // Crear y configurar la cuarta columna (botón de opciones)
+            const tdActions = document.createElement('td');
+
+            // Botón de opciones
+            const btnOptions = document.createElement('button');
+            btnOptions.className = 'btn';
+            btnOptions.setAttribute('data-id', e.id);
+
+            const iconOptions = document.createElement('i');
+            iconOptions.className = 'fa-solid fa-ellipsis-vertical';
+            btnOptions.appendChild(iconOptions);
+
+            // Contenedor de opciones (inicialmente oculto)
+            const divOptions = document.createElement('div');
+            divOptions.className = 'partner-options';
+            divOptions.id = `options-${e.id}`;
+            divOptions.style.display = 'none';
+
+            // Botones dentro de las opciones
+            const btnEdit = document.createElement('button');
+            btnEdit.innerHTML = '<i class="fa-regular fa-pen-to-square"></i> Editar datos';
+
+            const btnGeneratePlan = document.createElement('button');
+            btnGeneratePlan.innerHTML = '<i class="fa-regular fa-file"></i> Generar planilla';
+
+            const btnPause = document.createElement('button');
+            btnPause.innerHTML = '<i class="fa-regular fa-clock"></i> Pausar';
+
+            const btnCancel = document.createElement('button');
+            btnCancel.innerHTML = '<i class="fa-regular fa-circle-xmark"></i> Cancelar';
+
+            // Agregar los botones al div de opciones
+            divOptions.appendChild(btnEdit);
+            divOptions.appendChild(btnGeneratePlan);
+            divOptions.appendChild(btnPause);
+            divOptions.appendChild(btnCancel);
+
+            // Agregar el botón de opciones y el div de opciones a la columna de acciones
+            tdActions.appendChild(btnOptions);
+            tdActions.appendChild(divOptions);
+
+            // Finalmente, agregar todas las celdas a la fila (tr)
+            tr.appendChild(tdName);
+            tr.appendChild(tdPayment);
+            tr.appendChild(tdPaymentStatus);
+            tr.appendChild(tdActions);
+
+            // Agregar la fila al cuerpo de la tabla
+            partnerTableBody.appendChild(tr);
           });
 
           document.querySelectorAll('.btn').forEach(button => {
@@ -218,6 +243,14 @@
                 icon.classList.remove('fa-xmark');
                 icon.classList.add('fa-ellipsis-vertical'); // Cambiar el icono a elipsis
               }
+            });
+          });
+
+
+          document.querySelectorAll('td[data-id]').forEach(td => {
+            td.addEventListener('click', (event) => {
+              const memberId = event.target.closest('td').getAttribute('data-id');
+              loadPartnerPayments(memberId)
             });
           });
 
@@ -242,14 +275,164 @@
 
       };
 
-      const loadPartnerPayments = (partnerId) => {
-        // Simulación de carga de pagos
-        partnerPaymentsContainer.textContent = `Cargando pagos del socio ${partnerId}...`;
+      let currentId = ''
 
-        setTimeout(() => {
-          partnerPaymentsContainer.textContent = `Pagos cargados para el socio ${partnerId}`;
-        }, 1000);
-      };
+      const loadPartnerPayments = async (id) => {
+
+        if (currentId != id) {
+          currentId = id
+
+          partnerPaymentsContainer.innerHTML = ''
+          partnerPaymentsContainer.style.display = 'block'
+
+          const year = currentdate.getFullYear().toString()
+
+          const parnterName = document.createElement('h3')
+          const memberNumber = document.createElement('span')
+          const subtitle = document.createElement('h4')
+          const form = document.createElement('form')
+          const div = document.createElement('div')
+          const divOptions = document.createElement('div')
+          const p = document.createElement('p')
+          const btnNewPayment = document.createElement('button')
+          const btnPaymentOption1 = document.createElement('button')
+          const btnPaymentOption2 = document.createElement('button')
+          const btnPaymentOption3 = document.createElement('button')
+          const inputNewPayment = document.createElement('input')
+
+          try {
+            const response = await window.electronAPI.getPartnerPayments({ id, year })
+
+            const { partner, payments } = response
+
+            parnterName.innerText = partner.name
+            memberNumber.innerText = `Número de socio: ${partner.memberNumber}`
+            subtitle.innerText = `Pagos del año ${year}`
+
+            month = [
+              'enero',
+              'febrero',
+              'marzo',
+              'abril',
+              'mayo',
+              'junio',
+              'julio',
+              'agosto',
+              'septiembre',
+              'octubre',
+              'noviembre',
+              'diciembre',
+            ]
+
+            p.innerHTML = `Pago de <b>${month[currentdate.getMonth()]}</b>`
+
+            inputNewPayment.type = 'number'
+            inputNewPayment.placeholder = 'Monto'
+            inputNewPayment.name = 'payment'
+            inputNewPayment.required = true
+
+            btnNewPayment.type = 'submit'
+            btnNewPayment.innerText = 'Agregar pago'
+            btnNewPayment.className = 'btn'
+
+            btnPaymentOption1.type = 'button'
+            btnPaymentOption2.type = 'button'
+            btnPaymentOption3.type = 'button'
+            btnPaymentOption1.innerText = '$3.000'
+            btnPaymentOption2.innerText = '$5.000'
+            btnPaymentOption3.innerText = '$10.000'
+
+            partnerPaymentsContainer.appendChild(parnterName)
+            partnerPaymentsContainer.appendChild(memberNumber)
+
+            div.appendChild(inputNewPayment)
+            div.appendChild(btnNewPayment)
+            divOptions.appendChild(btnPaymentOption1)
+            divOptions.appendChild(btnPaymentOption2)
+            divOptions.appendChild(btnPaymentOption3)
+            form.appendChild(p)
+            form.appendChild(div)
+            form.appendChild(divOptions)
+
+            btnPaymentOption1.onclick = () => {
+              inputNewPayment.value = 3000
+            }
+
+            btnPaymentOption2.onclick = () => {
+              inputNewPayment.value = 5000
+            }
+
+            btnPaymentOption3.onclick = () => {
+              inputNewPayment.value = 10000
+            }
+
+            form.onsubmit = (e) => {
+              e.preventDefault()
+              addPayment({ id, e })
+              currentId = ''
+              getPartners({ collect: collectSelect.value, status: statusSelect.value })
+              loadPartnerPayments(id)
+            }
+
+            partnerPaymentsContainer.appendChild(form)
+
+            if (payments.length == 0) {
+              const noPayments = document.createElement('p')
+              noPayments.className = 'no-payments'
+              noPayments.innerText = `No hay pagos registrados del ${year}`
+              partnerPaymentsContainer.appendChild(subtitle)
+              partnerPaymentsContainer.appendChild(noPayments)
+              return
+            } else {
+              payments.forEach(e => {
+
+                const paymentDate = new Date(e.payment_date)
+                monthPaid = paymentDate.getMonth()
+
+                if (monthPaid == currentdate.getMonth()) {
+                  form.style.display = 'none'
+                  const p = document.createElement('p')
+                  p.className = 'payment-notification'
+                  p.innerHTML = `Mes de ${month[currentdate.getMonth()]} <b>PAGADO</b>`
+                  partnerPaymentsContainer.appendChild(p)
+                  partnerPaymentsContainer.appendChild(subtitle)
+                }
+
+                let i = 0
+
+                const calendar = document.createElement('div')
+                calendar.className = 'calendar'
+
+                while (i < 12) {
+
+
+                  if (monthPaid == i) {
+                    const divMonthPaid = document.createElement('div')
+                    divMonthPaid.innerHTML = `  
+                        <span>${month[i]}</span>
+                        <div style="background: #519819;"><i class="fa-solid fa-check"></i></div>`
+                    calendar.appendChild(divMonthPaid)
+                  } else {
+                    const divUnpaidMonth = document.createElement('div')
+                    divUnpaidMonth.innerHTML = `  
+                        <span>${month[i]}</span>
+                        <div></div>`
+                    calendar.appendChild(divUnpaidMonth)
+                  }
+
+
+                  i++
+                }
+
+                partnerPaymentsContainer.appendChild(calendar)
+              })
+            }
+
+          } catch (error) {
+            console.log(error)
+          }
+        }
+      }
 
       collectSelect.addEventListener('change', (e) => {
         collect = e.target.value;

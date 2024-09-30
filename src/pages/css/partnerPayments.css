@@ -2,6 +2,98 @@
     min-width: 330px;
     position: sticky;
     top: 100px;
-    outline: auto;
     display: none;
+}
+
+#partner-payments span {
+    font-size: 14px;
+}
+
+#partner-payments h4 {
+    margin: 30px 0 10px;
+}
+
+.no-payments {
+    display: block;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    margin-top: 20px;
+    background: #f0f0f0;
+}
+
+#partner-payments>form {
+    margin: 30px 0;
+
+}
+
+#partner-payments>form div {
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    gap: 10px;
+}
+
+#partner-payments>form div:last-child button {
+    padding: 5px 10px;
+    border-radius: 5px;
+    background: #fff;
+    border: 1px solid #385F99;
+    color: #385F99;
+    cursor: pointer;
+}
+
+#partner-payments>form div:last-child button:hover {
+    background: #385F9915;
+}
+
+#partner-payments>form input {
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    padding: 10px 20px;
+    outline: none;
+    border: none;
+    width: 160px;
+}
+
+#partner-payments>form button.btn {
+    background: #385F99;
+    color: #fff;
+}
+
+.payment-notification {
+    border-radius: 5px;
+    margin: 10px 0;
+    padding: 10px 20px;
+    border: 1px solid #eee;
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: 100px 100px 100px;
+    gap: 10px;
+}
+
+.calendar>div {
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar>div div {
+    height: 30px;
+    width: 30px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar>div span {
+    text-transform: capitalize;
+}
+
+.calendar>div div i {
+    color: #fff;
 }
