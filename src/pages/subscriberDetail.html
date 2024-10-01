@@ -5,41 +5,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="subscriberDetail.css">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./css/subscriberDetail.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="../scripts/formatDate.js"></script>
 </head>
 
-<body style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
-    <script type="module">
+<body style="display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 20px;">
+    <script>
 
         const body = document.getElementsByTagName('body')[0];
-
-        const formatDate = (date) => {
-            return new Date(date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })
-        }
 
         const subscriberOptions = (sub) => {
 
             body.innerHTML += `
                 <div class="subscriber-options">
-                    <button class="btn" id="btn-edit"><i class="fa-regular fa-pen-to-square"></i> Modificar monto</button>
+                    ${sub.status == 'authorized' ? '<button class="btn" id="btn-edit"><i class="fa-regular fa-pen-to-square"></i> Modificar monto</button>' : ''}
                     ${sub.status == 'authorized' ? '<button class="btn" id="btn-pause"><i class="fa-regular fa-clock"></i> Pausar</button>' : ''}
-                    ${sub.status != 'authorized' ? '<button class="btn" id="btn-resume"><i class="fa-regular fa-circle-xmark" style="transform: rotateZ(45deg)"></i> Reanudar</button>' : ''}
+                    ${sub.status != 'authorized' ? '<button class="btn" id="btn-resume"><i class="fa-regular fa-circle-xmark" style="transform: rotateZ(45deg)"></i> Reactivar</button>' : ''}
                     <button class="btn" id="btn-cancel"><i class="fa-regular fa-circle-xmark"></i> Cancelar</button>
                 </div>
             `
-            const btnEdit = document.getElementById('btn-edit')
-            const btnPause = document.getElementById('btn-pause')
-            const btnResume = sub.status != 'authorized' && document.getElementById('btn-resume')
-            const btnCancel = document.getElementById('btn-cancel')
 
-            btnEdit.addEventListener('click', () => window.electronAPI.openViewEditAmount(sub))
+            if (sub.status == 'authorized') {
+                const btnEdit = document.getElementById('btn-edit')
+                const btnPause = document.getElementById('btn-pause')
+
+                btnEdit.addEventListener('click', () => window.electronAPI.openViewEditAmount(sub))
+                btnPause.addEventListener('click', () => window.electronAPI.openViewPauseSubscriber(sub))
+            } else if (sub.status != 'authorized') {
+                const btnResume = document.getElementById('btn-resume')
+
+                btnResume.addEventListener('click', () => window.electronAPI.openViewResumeSubscriber(sub))
+            }
+
+            const btnCancel = document.getElementById('btn-cancel')
+            // btnCancel.addEventListener('click', () => window.electronAPI.openViewEditAmount(sub))
         }
 
         const generateView = async (args) => {
+            console.log(args)
+
             body.innerHTML = '';
 
             const { id, payer_first_name, payer_last_name } = args
@@ -77,10 +85,10 @@
             }
         }
 
-        window.electronAPI.updateViewSubscribedDetail((_,args) => generateView(args));
+        window.electronAPI.updateViewSubscribedDetail((_, args) => generateView(args));
 
         window.electronAPI.onReceiveSubscriberId((_, args) => generateView(args));
-        
+
     </script>
 </body>
 

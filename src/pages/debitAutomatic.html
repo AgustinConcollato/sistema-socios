@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Débito automático</title>
-    <link rel="stylesheet" href="../css/nav.css">
-    <link rel="stylesheet" href="../css/header.css">
-    <link rel="stylesheet" href="../css/plan.css">
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="./css/nav.css">
+    <link rel="stylesheet" href="./css/header.css">
+    <link rel="stylesheet" href="./css/plan.css">
+    <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -20,36 +20,34 @@
 </head>
 
 <body>
-    <nav>
-        <div class="container-logo">
-            <img src="../../assets/img/logo.png" />
+    <header>
+        <nav>
+            <div class="container-logo">
+                <img src="../assets/img/logo.png" />
+            </div>
+            <ul>
+                <li><a href='./index.html'>Socios</a></li>
+                <li><a href='#'>Débito automático</a></li>
+                <li><a href='./payroll.html'>Planillas</a></li>
+            </ul>
+        </nav>
+        <!-- <div class="searcher">
+            <label for="search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </label>
+            <input type="text" id="search" placeholder="Buscar por nombre, apellido o número de socio" />
+            <div class="response"></div>
+        </div> -->
+        <button class='btn' id="newPartner">+ Nuevo socio</button>
+    </header>
+    <section>
+        <h1>Débito automático</h1>
+        <div class="container-plans" id="container-plans">
+            <span>
+                <div class="loading"></div>
+            </span>
         </div>
-        <ul>
-            <li><a href='../index.html'>Socios</a></li>
-            <li><a href='#'>Débito automático</a></li>
-            <li><a href='../payroll/payroll.html'>Planillas</a></li>
-        </ul>
-    </nav>
-    <main>
-        <header>
-            <div class="searcher">
-                <label for="search">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </label>
-                <input type="text" id="search" placeholder="Buscar por nombre, apellido o número de socio" />
-                <div class="response"></div>
-            </div>
-            <button class='btn' id="newPartner">+ Nuevo socio</button>
-        </header>
-        <section>
-            <h1>Débito automático</h1>
-            <div class="container-plans" id="container-plans">
-                <span>
-                    <div class="loading"></div>
-                </span>
-            </div>
-        </section>
-    </main>
+    </section>
 
     <script>
 
@@ -88,7 +86,6 @@
                 try {
                     const plans = await window.electronAPI.getPlans()
                     containerPlans.innerHTML = ''
-
                     plans.forEach(data => {
 
                         const divPlan = document.createElement('div')
@@ -120,7 +117,7 @@
                         btnCopyLink.innerText = 'Copiar link'
 
                         btnSeePartners.onclick = () => localStorage.setItem('plan-selected', JSON.stringify(data))
-                        btnSeePartners.href = '../index.html'
+                        btnSeePartners.href = './planDetails.html'
 
                         dataPlan.title = data.reason
 
@@ -189,7 +186,7 @@
 
     </script>
 
-    <script src="../../scripts/openViewNewPartner.js"></script>
+    <script src="../scripts/openViewNewPartner.js"></script>
 
 </body>
 

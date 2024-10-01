@@ -56,7 +56,7 @@ function createWindow() {
             },
         });
 
-        subscriberDetail.loadFile('./src/pages/subscriberDetail/subscriberDetail.html')
+        subscriberDetail.loadFile('./src/pages/subscriberDetail.html')
             .then(() => {
                 subscriberDetail.webContents.send('send-subscriber-id', e);
             });
@@ -78,11 +78,53 @@ function createWindow() {
             },
         });
 
-        editAmount.loadFile('./src/pages/subscriberDetail/editAmount.html')
+        editAmount.loadFile('./src/pages/editAmount.html')
             .then(() => {
                 editAmount.webContents.send('send-subscriber-id', e);
             });
 
+    });
+
+    ipcMain.on('open-view-pause-subscriber', (_, e) => {
+        const pauseSubscriber = new BrowserWindow({
+            width: 600,
+            height: 350,
+            minWidth: 600,
+            minHeight: 350,
+            modal: true,
+            parent: subscriberDetail,
+            minimizable: false,
+            fullscreenable: true,
+            webPreferences: {
+                preload: path.join(__dirname, 'preload.js')
+            },
+        });
+
+        pauseSubscriber.loadFile('./src/pages/pauseSubscriber.html')
+            .then(() => {
+                pauseSubscriber.webContents.send('send-subscriber-id', e);
+            });
+    });
+    
+    ipcMain.on('open-view-resume-subscriber', (_, e) => {
+        const resumeSubscriber = new BrowserWindow({
+            width: 600,
+            height: 350,
+            minWidth: 600,
+            minHeight: 350,
+            modal: true,
+            parent: subscriberDetail,
+            minimizable: false,
+            fullscreenable: true,
+            webPreferences: {
+                preload: path.join(__dirname, 'preload.js')
+            },
+        });
+
+        resumeSubscriber.loadFile('./src/pages/resumeSubscriber.html')
+            .then(() => {
+                resumeSubscriber.webContents.send('send-subscriber-id', e);
+            });
     });
 
     ipcMain.on('subscriber-detail-updated', (_, newData) => {
@@ -90,7 +132,6 @@ function createWindow() {
     });
 
     ipcMain.on('partner-list-update', (_, e) => {
-        console.log(e)
         win.webContents.send('update-partner-list', e.collect);
     });
 }

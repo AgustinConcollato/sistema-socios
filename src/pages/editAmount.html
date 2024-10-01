@@ -5,15 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modificar monto</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./css/editAmount.css">
 </head>
 
 <body style="padding: 20px;">
 
     <h2>Modificar monto</h2>
 
-
-    <script type="module">
+    <script>
         window.electronAPI.onReceiveSubscriberId((_, sub) => {
 
             const body = document.getElementsByTagName('body')[0];
@@ -23,12 +23,12 @@
             body.innerHTML += `<p>Se le avisará a <strong>${sub.payer_first_name} ${sub.payer_last_name}</strong> que el precio fue actualizado</p>`
             body.innerHTML += `
                 <form id="form-new-amount">
-                    <div style="margin-top: 20px">
-                    <input type="number" placeholder="Ingresar nuevo monto" required>
+                    <div style="margin: 20px 0;">
+                        <input style="background:#f0f0f0; padding: 10px 20px; border-radius: 5px; border: none; width: 100%;" type="number" placeholder="Ingresar nuevo monto" required>
                     </div>
                     <div style="display:flex; gap:10px; flex-direction:row;">
                         <button class="btn" type="button" id="btn-cancel">Cancelar</button>
-                        <button class="btn" style="color: #fff; background: #385f99;" type="submit">Modificar</button>
+                        <button class="btn" style="color: #fff; background: #385f99;" type="submit">Modificar monto</button>
                         <div id="loading" style="visibility: hidden; margin:0;" class="loading"></div>
                     </div>
                 </form>
@@ -49,10 +49,10 @@
 
                 try {
                     const response = await window.electronAPI.updateSubscriberAmount({ id: sub.id, newAmount });
-                    if(response.auto_recurring.transaction_amount == newAmount){
+                    if (response.auto_recurring.transaction_amount == newAmount) {
                         window.electronAPI.notifySubscriberDetailUpdate(response);
                         window.close()
-                    } 
+                    }
                 } catch (error) {
                     console.log(error)
                 }

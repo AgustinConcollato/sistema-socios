@@ -14,7 +14,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openViewSubscribedDetail: (e) => ipcRenderer.send('open-view-subscriber-detail', e),
     onReceiveSubscriberId: (e) => ipcRenderer.on('send-subscriber-id', e),
     openViewEditAmount: (e) => ipcRenderer.send('open-view-edit-amount', e),
+    openViewPauseSubscriber: (e) => ipcRenderer.send('open-view-pause-subscriber', e),
+    openViewResumeSubscriber: (e) => ipcRenderer.send('open-view-resume-subscriber', e),
     updateSubscriberAmount: (e) => ipcRenderer.invoke('update-subscriber-amount', e),
+    pauseSubscriber: (e) => ipcRenderer.invoke('pause-subscriber', e),
+    resumeSubscriber: (e) => ipcRenderer.invoke('resume-subscriber', e),
     updateViewSubscribedDetail: (e) => ipcRenderer.on('update-view-subscribed-detail', e),
     updatePartnerList: (e) => {
         ipcRenderer.removeAllListeners('update-partner-list');

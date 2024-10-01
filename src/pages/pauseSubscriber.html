@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body style="padding: 20px;">
+    <h2>¿Querés pausar la suscripción?</h2>
+
+    <script>
+        window.electronAPI.onReceiveSubscriberId((_, sub) => {
+
+            const body = document.getElementsByTagName('body')[0];
+
+            document.title = `Pausar suscripción de ${sub.payer_first_name} ${sub.payer_last_name}`
+
+            body.innerHTML += `<p>Hasta que decidas reactivar a <strong>${sub.payer_first_name} ${sub.payer_last_name}</strong> no se debitarán pagos y le avisaremos por mail</p>`
+            body.innerHTML += `
+                <form id="form-pause-subscriber">
+                    <div style="display:flex; gap:10px; flex-direction:row; margin-top: 40px;">
+                        <button class="btn" type="button" id="btn-cancel">Cancelar</button>
+                        <button class="btn" style="color: #fff; background: #385f99;" type="submit">Pausar socio</button>
+                    </div>
+                </form>
+            `
+            const btnCancel = document.getElementById('btn-cancel')
+            const formPauseSubscriber = document.getElementById('form-pause-subscriber')
+
+            formPauseSubscriber.onsubmit = () => {
+                window.electronAPI.pauseSubscriber(sub)
+                window.close()
+            }
+
+            btnCancel.addEventListener('click', () => window.close())
+        })
+    </script>
+</body>
+
+</html>

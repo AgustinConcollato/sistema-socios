@@ -1,0 +1,75 @@
+.header-plan {
+    margin-bottom: 20px;
+}
+
+.header-plan h3 {
+    font-size: 18px;
+}
+
+#table-subscribers {
+    width: 100%;
+}
+
+#table-subscribers tr td {
+    padding: 7px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+#table-subscribers thead tr td {
+    font-size: 14px;
+}
+
+.header-plan span {
+    font-size: 14px;
+    display: block;
+    margin: 20px 0 5px;
+}
+
+.container-select {
+    position: relative;
+    width: 150px;
+}
+
+.container-select select {
+    padding: 15px 50px 15px 20px;
+    border-radius: 5px;
+    border: 1px solid #eee;
+    cursor: pointer;
+    font-size: 14px;
+    appearance: none;
+    width: 100%;
+}
+
+.container-select i {
+    font-size: 13px;
+    position: absolute;
+    top: calc(50% - 2px);
+    right: 20px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+#pagination {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#pagination button {
+    padding: 5px 10px;
+    background: none;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#pagination .page-active {
+    background: #385F99;
+    color: #fff;
+}
+
+#pagination p {
+    display: inline-block;
+    padding: 2px;
+}

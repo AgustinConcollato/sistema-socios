@@ -19,9 +19,9 @@ ipcMain.handle('get-plans', async () => {
     }
 })
 
-ipcMain.handle('get-subscribers', async (_, id) => {
+ipcMain.handle('get-subscribers', async (_, e) => {
     try {
-        const subs = await getSubscribers(id);
+        const subs = await getSubscribers(e);
         return subs
     } catch (error) {
         console.error('Error obteniendo planes:', error);
@@ -40,6 +40,24 @@ ipcMain.handle('get-subscriber-detail', async (_, id) => {
 ipcMain.handle('update-subscriber-amount', async (_, { id, newAmount }) => {
     try {
         const response = await updateSubscriberAmount(id, newAmount);
+        return response
+    } catch (error) {
+        console.error('Error obteniendo planes:', error);
+    }
+})
+
+ipcMain.handle('pause-subscriber', async (_, { id }) => {
+    try {
+        const response = await pauseSubscriber(id);
+        return response
+    } catch (error) {
+        console.error('Error obteniendo planes:', error);
+    }
+})
+
+ipcMain.handle('resume-subscriber', async (_, { id }) => {
+    try {
+        const response = await resumeSubscriber(id);
         return response
     } catch (error) {
         console.error('Error obteniendo planes:', error);
@@ -65,17 +83,20 @@ async function getPlans() {
     }
 }
 
-async function getSubscribers(id) {
+async function getSubscribers({ id, status, offset }) {
     try {
         const response = await preApprovalClient.search({
             options: {
-                preapproval_plan_id: id
+                preapproval_plan_id: id,
+                status,
+                limit: status == 'authorized' ? 10 : 90,
+                offset,
+                sort: 'payer_first_name:asc'
             }
         })
 
         const results = response.results
 
-        // results.id <---- este id es el que se utiliza para obtener el detalle, cancelar, pauser y reanudar a un suscriptor  
         return results
     } catch (error) {
         console.log(error);
@@ -95,7 +116,9 @@ async function cancelSubscriber(id) {
     try {
         const response = await preApprovalClient.update({
             id,
-            status: "cancelled"
+            body: {
+                status: "cancelled"
+            }
         });
         return response;
     } catch (error) {
@@ -107,7 +130,9 @@ async function pauseSubscriber(id) {
     try {
         const response = await preApprovalClient.update({
             id,
-            status: "paused"
+            body: {
+                status: "paused"
+            }
         });
         return response;
     } catch (error) {
@@ -119,7 +144,9 @@ async function resumeSubscriber(id) {
     try {
         const response = await preApprovalClient.update({
             id,
-            status: "authorized" // o "active", dependiendo del flujo de pago
+            body: {
+                status: "authorized"
+            }
         });
         return response;
     } catch (error) {

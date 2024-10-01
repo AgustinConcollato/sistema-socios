@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Débito automático</title>
+    <link rel="stylesheet" href="./css/nav.css">
+    <link rel="stylesheet" href="./css/header.css">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./css/planDetails.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+        integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="../scripts/formatDate.js"></script>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="container-logo">
+                <img src="../assets/img/logo.png" />
+            </div>
+            <ul>
+                <li><a href='./index.html'>Socios</a></li>
+                <li><a href='./debitAutomatic.html'>Débito automático</a></li>
+                <li><a href='./payroll.html'>Planillas</a></li>
+            </ul>
+        </nav>
+        <!-- <div class="searcher">
+            <label for="search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </label>
+            <input type="text" id="search" placeholder="Buscar por nombre, apellido o número de socio" />
+            <div class="response"></div>
+        </div> -->
+        <button class='btn' id="newPartner">+ Nuevo socio</button>
+    </header>
+    <section>
+        <div class="header-plan">
+            <div>
+                <h3 id="plan-name"></h3>
+                <p id="plan-info"></p>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span>Estado del suscriptor</span>
+                    <div class="container-select">
+                        <select id="subscriber-status">
+                            <option value="authorized">Activo</option>
+                            <option value="paused">En pausa</option>
+                        </select>
+                        <i class="fa-solid fa-angle-down"></i>
+                    </div>
+                </div>
+                <div id="pagination"></div>
+            </div>
+        </div>
+        <div id="container-results">
+            <div class="loading"></div>
+        </div>
+    </section>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const planName = document.getElementById('plan-name')
+            const planInfo = document.getElementById('plan-info')
+            const containerResults = document.getElementById('container-results')
+            const subscriberStatus = document.getElementById('subscriber-status')
+            const paginationElement = document.getElementById('pagination')
+
+            const planSelected = JSON.parse(localStorage.getItem('plan-selected'))
+
+            planName.innerText = planSelected.reason
+            planInfo.innerText = planSelected.auto_recurring.frequency !== 1 ?
+                `Se debitará cada ${planSelected.auto_recurring.frequency} meses` :
+                `Se debitará cada ${planSelected.auto_recurring.frequency} mes`
+
+            let result = null
+
+            const getSubscribers = async (e) => {
+
+                e.status == 'paused' ?
+                    paginationElement.style.display = 'none' :
+                    paginationElement.style.display = 'flex'
+
+                containerResults.innerHTML = '<div class="loading"></div>'
+
+                try {
+                    result = await window.electronAPI.getSubscribers(e)
+
+                    if (result && result.length != 0) {
+                        containerResults.innerHTML = ''
+
+                        containerResults.innerHTML = `
+                        <table id="table-subscribers" cellSpacing="0">
+                            <thead>
+                                <tr>
+                                    <td>Nombre/Referencia</td>
+                                    <td>Próximo cobro</td>
+                                    <td>Monto</td>
+                                    <td></td>
+                                </tr>
+                            </thead>
+                        </table>
+                        `
+                        const tableSubscribers = document.getElementById('table-subscribers')
+                        const tbody = document.createElement('tbody')
+
+                        result.forEach(e => {
+
+                            const tr = document.createElement('tr')
+                            const btnDetails = document.createElement('button')
+                            const tdName = document.createElement('td')
+                            const tdNextPaymentDate = document.createElement('td')
+                            const tdAmount = document.createElement('td')
+                            const tdBtnDetails = document.createElement('td')
+
+                            tdName.innerText = `${e.payer_first_name} ${e.payer_last_name}`
+                            tdNextPaymentDate.innerText = formatDate(e.next_payment_date)
+                            tdAmount.innerText = '$' + e.auto_recurring.transaction_amount
+                            btnDetails.innerText = 'Ver detalles'
+                            btnDetails.className = 'btn'
+
+                            btnDetails.onclick = () => openViewSubscriberDetail(e)
+
+                            tdBtnDetails.appendChild(btnDetails)
+                            tr.appendChild(tdName)
+                            tr.appendChild(tdNextPaymentDate)
+                            tr.appendChild(tdAmount)
+                            tr.appendChild(tdBtnDetails)
+
+                            tbody.appendChild(tr)
+
+                        });
+
+                        tableSubscribers.appendChild(tbody)
+                    } else {
+                        containerResults.innerHTML = `<p>No hay socios ${subscriberStatus.value != 'pause' ? 'pausados' : 'activos'}</p>`
+                    }
+
+
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+
+            const openViewSubscriberDetail = (e) => window.electronAPI.openViewSubscribedDetail(e)
+
+            const totalItems = planSelected.subscribed // Número total de elementos
+            const itemsPerPage = 10
+            let currentOffset = 0
+            const maxPageButtons = 3
+
+            const updatePagination = () => {
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                const currentPage = Math.floor(currentOffset / itemsPerPage) + 1;
+                paginationElement.innerHTML = ''; // Limpiar la paginación
+
+                const generatePageNumbers = () => {
+                    let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+                    let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+                    if (endPage - startPage < maxPageButtons - 1) {
+                        startPage = Math.max(1, endPage - maxPageButtons + 1);
+                    }
+
+                    const pages = [];
+                    for (let i = startPage; i <= endPage; i++) {
+                        pages.push(i);
+                    }
+                    return pages;
+                };
+
+                const pageNumbers = generatePageNumbers();
+
+                // Botón "Anterior"
+                if (currentPage > 1) {
+                    const prevButton = document.createElement('button');
+                    prevButton.innerText = 'Anterior';
+                    prevButton.onclick = () => onPageChange(currentOffset - itemsPerPage);
+                    paginationElement.appendChild(prevButton);
+                }
+
+                // Páginas iniciales y "..."
+                if (pageNumbers[0] > 1) {
+                    const firstPageButton = document.createElement('button');
+                    firstPageButton.innerText = '1';
+                    firstPageButton.onclick = () => onPageChange(0);
+                    paginationElement.appendChild(firstPageButton);
+
+                    if (pageNumbers[0] > 2) {
+                        const dots = document.createElement('p');
+                        dots.innerText = '...';
+                        paginationElement.appendChild(dots);
+                    }
+                }
+
+                // Botones de páginas
+                pageNumbers.forEach(page => {
+                    const pageButton = document.createElement('button');
+                    pageButton.innerText = page;
+                    if (page === currentPage) {
+                        pageButton.classList.add('page-active');
+                    }
+                    pageButton.onclick = () => onPageChange((page - 1) * itemsPerPage);
+                    paginationElement.appendChild(pageButton);
+                });
+
+                // Páginas finales y "..."
+                if (pageNumbers[pageNumbers.length - 1] < totalPages) {
+                    if (pageNumbers[pageNumbers.length - 1] < totalPages - 1) {
+                        const dots = document.createElement('p');
+                        dots.innerText = '...';
+                        paginationElement.appendChild(dots);
+                    }
+
+                    const lastPageButton = document.createElement('button');
+                    lastPageButton.innerText = totalPages;
+                    lastPageButton.onclick = () => onPageChange((totalPages - 1) * itemsPerPage);
+                    paginationElement.appendChild(lastPageButton);
+                }
+
+                // Botón "Siguiente"
+                if (currentPage < totalPages) {
+                    const nextButton = document.createElement('button');
+                    nextButton.innerText = 'Siguiente';
+                    nextButton.onclick = () => onPageChange(currentOffset + itemsPerPage);
+                    paginationElement.appendChild(nextButton);
+                }
+            };
+
+            const onPageChange = (newOffset) => {
+                currentOffset = newOffset;
+                updatePagination();
+                getSubscribers({ id: planSelected.id, status: subscriberStatus.value, offset: currentOffset })
+                // Aquí también puedes actualizar la vista de tus elementos, por ejemplo, cargando los nuevos datos
+            };
+
+            if (totalItems > 10) {
+                updatePagination();
+            }
+
+            subscriberStatus.addEventListener('change', (e) => {
+                result = null
+                getSubscribers({ id: planSelected.id, status: e.target.value, offset: 0 })
+            })
+
+            getSubscribers({ id: planSelected.id, status: subscriberStatus.value, offset: 0 })
+        })
+
+    </script>
+    <script src="../scripts/openViewNewPartner.js"></script>
+
+</body>
+
+</html>
