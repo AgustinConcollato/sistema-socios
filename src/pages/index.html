@@ -372,21 +372,26 @@
             }
 
             partnerPaymentsContainer.appendChild(form)
+            partnerPaymentsContainer.appendChild(subtitle)
 
             if (payments.length == 0) {
               const noPayments = document.createElement('p')
               noPayments.className = 'no-payments'
               noPayments.innerText = `No hay pagos registrados del ${year}`
-              partnerPaymentsContainer.appendChild(subtitle)
               partnerPaymentsContainer.appendChild(noPayments)
               return
             } else {
+
+              let monthsPaid = []
+              const calendar = document.createElement('div')
+              calendar.className = 'calendar'
+
               payments.forEach(e => {
 
                 const paymentDate = new Date(e.payment_date)
-                monthPaid = paymentDate.getMonth()
+                monthsPaid[paymentDate.getMonth()] = paymentDate.getMonth()
 
-                if (monthPaid == currentdate.getMonth()) {
+                if (paymentDate.getMonth() == currentdate.getMonth()) {
                   form.style.display = 'none'
                   const p = document.createElement('p')
                   p.className = 'payment-notification'
@@ -395,34 +400,12 @@
                   partnerPaymentsContainer.appendChild(subtitle)
                 }
 
-                let i = 0
-
-                const calendar = document.createElement('div')
-                calendar.className = 'calendar'
-
-                while (i < 12) {
-
-
-                  if (monthPaid == i) {
-                    const divMonthPaid = document.createElement('div')
-                    divMonthPaid.innerHTML = `  
-                        <span>${month[i]}</span>
-                        <div style="background: #519819;"><i class="fa-solid fa-check"></i></div>`
-                    calendar.appendChild(divMonthPaid)
-                  } else {
-                    const divUnpaidMonth = document.createElement('div')
-                    divUnpaidMonth.innerHTML = `  
-                        <span>${month[i]}</span>
-                        <div></div>`
-                    calendar.appendChild(divUnpaidMonth)
-                  }
-
-
-                  i++
-                }
-
-                partnerPaymentsContainer.appendChild(calendar)
               })
+
+              generateCalendar(calendar, monthsPaid)
+
+
+              partnerPaymentsContainer.appendChild(calendar)
             }
 
           } catch (error) {
@@ -446,6 +429,31 @@
         collectSelect.value = collect;
         getPartners({ collect, status });
       });
+
+      const generateCalendar = (calendar, monthsPaid) => {
+
+        let i = 0
+
+        while (i < 12) {
+          if (monthsPaid[i] == i) {
+            const divMonthPaid = document.createElement('div')
+            divMonthPaid.innerHTML = `  
+              <span>${month[i]}</span>
+              <div style="background: #519819;"><i class="fa-solid fa-check"></i></div>
+            `
+            calendar.appendChild(divMonthPaid)
+          } else {
+            const divUnpaidMonth = document.createElement('div')
+            divUnpaidMonth.innerHTML = `  
+              <span>${month[i]}</span>
+              <div></div>
+            `
+            calendar.appendChild(divUnpaidMonth)
+          }
+
+          i++
+        }
+      }
 
       getPartners({ collect, status });
 
