@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/nav.css">
+    <link rel="stylesheet" href="./css/header.css">
+    <link rel="stylesheet" href="./css/paymentSheet.css">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="container-logo">
+                <img src="../assets/img/logo.png" />
+            </div>
+            <ul>
+                <li><a href='./index.html'>Socios</a></li>
+                <li><a href='./debitAutomatic.html'>Débito automático</a></li>
+                <li><a href='#'>Planillas</a></li>
+            </ul>
+        </nav>
+        <!-- <div class="searcher">
+                <label for="search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </label>
+                <input type="text" id="search" placeholder="Buscar por nombre, apellido o número de socio" />
+                <div class="response"></div>
+            </div> -->
+        <button class='btn' id="newPartner">+ Nuevo socio</button>
+    </header>
+    <section>
+        <h1>Planillas</h1>
+        <ul class="type-payment-sheet">
+            <li><button class="btn" id="btn-menu-generate">Generar planillas socios</button></li>
+            <li><button class="btn">Generar planilla para cobrador</button></li>
+            <ul class="payment-sheet-options" id="payment-sheet-options">
+                <li><button id="btn-secretariat">Secretaría</button></li>
+                <li><button id="btn-collect">Cobrador</button></li>
+                <li><button id="btn-all">Todas</button></li>
+            </ul>
+        </ul>
+        <h3>vista previa</h3>
+        <div id="container-previews">
+            <p><span>Todavía no se generó ninguna planilla</span> <br> seleccionar una de las opciones de arriba</p>
+        </div>
+    </section>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnMenuGenerate = document.getElementById('btn-menu-generate')
+            const paymentSheetOptions = document.getElementById('payment-sheet-options')
+            const btnSecretariat = document.getElementById('btn-secretariat')
+            const btnCollect = document.getElementById('btn-collect')
+            const btnAll = document.getElementById('btn-all')
+            const containerPreviews = document.getElementById('container-previews')
+
+            let menu = false
+
+            btnMenuGenerate.addEventListener('click', () => {
+                menu = !menu
+
+                menu ? paymentSheetOptions.style.display = 'block' : paymentSheetOptions.style.display = 'none'
+            })
+
+            paymentSheetOptions.addEventListener('click', () => {
+                menu = false
+                paymentSheetOptions.style.display = 'none'
+            })
+
+            btnSecretariat.addEventListener('click', () => alert())
+
+            btnCollect.addEventListener('click', () => alert())
+
+            btnAll.addEventListener('click', () => alert())
+
+        })
+
+    </script>
+    <script src="../scripts/openViewNewPartner.js"></script>
+</body>
+
+</html>

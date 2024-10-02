@@ -1,0 +1,56 @@
+.type-payment-sheet {
+    display: flex;
+    gap: 10px;
+    position: relative;
+    margin: 30px 0;
+}
+
+.payment-sheet-options {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 10px);
+}
+
+.payment-sheet-options {
+    width: 180px;
+    background: #fff;
+    border-radius: 5px;
+    border: 1px solid #eee;
+    box-shadow: 0 5px 10px #00000020;
+    border-radius: 10px;
+    z-index: 100;
+    overflow: hidden;
+    display: none;
+}
+
+.payment-sheet-options button {
+    width: 100%;
+    text-align: start;
+    padding: 10px 20px;
+    background: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.payment-sheet-options button:hover {
+    background: #f5f5f5;
+}
+
+.payment-sheet-options #btn-collect {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+#container-previews p{
+    padding: 20px;
+    border-radius: 10px;
+    background: #f0f0f0;
+    text-align: center;
+    margin-top: 30px;
+}
+
+
+#container-previews p span {
+    font-size: 18px;
+    font-weight: 600;
+}

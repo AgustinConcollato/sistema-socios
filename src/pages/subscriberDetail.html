@@ -50,7 +50,8 @@
 
             body.innerHTML = '';
 
-            const { id, payer_first_name, payer_last_name } = args
+            const { id } = args
+            const { payer_first_name, payer_last_name } = JSON.parse(localStorage.getItem('sub'))
 
             document.title = `Detalle de ${payer_first_name} ${payer_last_name}`;
 
@@ -87,7 +88,10 @@
 
         window.electronAPI.updateViewSubscribedDetail((_, args) => generateView(args));
 
-        window.electronAPI.onReceiveSubscriberId((_, args) => generateView(args));
+        window.electronAPI.onReceiveSubscriberId((_, args) => {
+            localStorage.setItem('sub', JSON.stringify(args))
+            generateView(args)
+        });
 
     </script>
 </body>

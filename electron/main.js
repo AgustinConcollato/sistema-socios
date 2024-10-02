@@ -3,7 +3,7 @@ const path = require('path');
 const { ipcMain } = require('electron/main');
 
 function createWindow() {
-    // Menu.setApplicationMenu(null);   
+    // Menu.setApplicationMenu(null);
 
     const win = new BrowserWindow({
         width: 1366,
@@ -34,11 +34,6 @@ function createWindow() {
             },
         });
         formNewPartner.loadFile('./src/pages/addPartner/addPartner.html');
-
-
-        formNewPartner.on('closed', () => {
-            console.log('Child window closed');
-        });
     });
 
     let subscriberDetail;
@@ -127,6 +122,26 @@ function createWindow() {
             });
     });
 
+    ipcMain.on('open-view-cancel-partner', (_, e) => {
+        const resumeSubscriber = new BrowserWindow({
+            width: 600,
+            height: 350,
+            minWidth: 600,
+            minHeight: 350,
+            modal: true,
+            minimizable: false,
+            fullscreenable: true,
+            webPreferences: {
+                preload: path.join(__dirname, 'preload.js')
+            },
+        });
+
+        resumeSubscriber.loadFile('./src/pages/cancelPartner.html')
+            .then(() => {
+                resumeSubscriber.webContents.send('send-partner', e);
+            });
+    });
+
     ipcMain.on('subscriber-detail-updated', (_, newData) => {
         subscriberDetail.webContents.send('update-view-subscribed-detail', newData);
     });
@@ -136,16 +151,15 @@ function createWindow() {
     });
 }
 
-
-
 app.on('ready', () => {
     createWindow()
     require('./utils/database')
-    require('./utils/addPartner')
+    require('./utils/partner')
     require('./utils/getPartner')
     require('./utils/getPartnerPayments')
     require('./utils/addPayment')
     require('./utils/subscriptionMP')
+    require('./utils/generatePDF')
 });
 
 app.on('window-all-closed', () => {

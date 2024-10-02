@@ -1,0 +1,24 @@
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pagination button {
+    padding: 7px 15px;
+    background: none;
+    outline: none;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #eee;
+}
+
+.pagination .page-active {
+    background: #385F99;
+    color: #fff;
+}
+
+.pagination p {
+    display: inline-block;
+    padding: 2px;
+}

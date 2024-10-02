@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body style="padding: 20px;">
+    <script>
+        window.electronAPI.onReceivePartner((_, partner) => {
+            document.title = `Dar de baja a ${partner.name}`
+
+            const body = document.getElementsByTagName('body')[0];
+
+            const h2 = document.createElement('h2')
+            const p = document.createElement('p')
+
+            h2.style.marginBottom = '5px'
+
+            h2.innerText = `¿Quierés dar de baja a un socio?`
+            p.innerHTML = `Al dar de baja a <b>${partner.name}</b> se eliminan de forma <b>permanente</b> todos sus datos y registros de pago`
+
+            body.appendChild(h2)
+            body.appendChild(p)
+
+            body.innerHTML += `
+                <form id="form-cancel-subscriber">
+                    <div style="display:flex; gap:10px; flex-direction:row; margin-top: 40px;">
+                        <button class="btn" type="button" id="btn-cancel">Cancelar</button>
+                        <button class="btn" style="color: #fff; background: #385f99;" type="submit">Dar de baja</button>
+                    </div>
+                </form>
+            `
+            const btnCancel = document.getElementById('btn-cancel')
+            const formPauseSubscriber = document.getElementById('form-cancel-subscriber')
+
+            formPauseSubscriber.onsubmit = async (e) => {
+                e.preventDefault()
+                try {
+                    const response = await window.electronAPI.cancelPartner(partner)
+                    window.electronAPI.notifyPartnerListUpdate(response.partner);
+                    window.close()
+                } catch (error) {
+
+                }
+            }
+
+            btnCancel.addEventListener('click', () => window.close())
+        })
+    </script>
+</body>
+
+</html>

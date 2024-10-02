@@ -1,8 +1,23 @@
 #partner-payments {
-    min-width: 330px;
+    min-width: 350px;
     position: sticky;
-    top: 100px;
+    top: 110px;
     display: none;
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 5px 10px #00000010;
+}
+
+.close-payments {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background: #f0f0f0;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #partner-payments span {
@@ -15,7 +30,7 @@
 
 .no-payments {
     display: block;
-    padding: 20px;
+    padding: 20px 10px;
     border-radius: 10px;
     text-align: center;
     margin-top: 20px;

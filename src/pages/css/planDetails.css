@@ -48,28 +48,3 @@
     transform: translateY(-50%);
     pointer-events: none;
 }
-
-#pagination {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-#pagination button {
-    padding: 5px 10px;
-    background: none;
-    outline: none;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-#pagination .page-active {
-    background: #385F99;
-    color: #fff;
-}
-
-#pagination p {
-    display: inline-block;
-    padding: 2px;
-}

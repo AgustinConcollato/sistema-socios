@@ -10,9 +10,12 @@
   <link rel="stylesheet" href="./css/header.css">
   <link rel="stylesheet" href="./css/partnerList.css">
   <link rel="stylesheet" href="./css/partnerPayments.css">
+  <link rel="stylesheet" href="./css/pagination.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script src="../scripts/addPayment.js"></script>
   <script src="../scripts/formatNumber.js"></script>
 </head>
@@ -26,7 +29,7 @@
       <ul>
         <li><a href='#'>Socios</a></li>
         <li><a href='./debitAutomatic.html'>Débito automático</a></li>
-        <li><a href='./payroll.html'>Planillas</a></li>
+        <li><a href='./paymentSheet.html'>Planillas</a></li>
       </ul>
     </nav>
     <!-- <div class="searcher">
@@ -40,27 +43,30 @@
   </header>
   <section>
     <h1>Socios</h1>
-    <div class="filters">
-      <div>
-        <span>Lugar de pago</span>
-        <div class="container-select">
-          <select id="collect">
-            <option value="1">Secretaría parroquial</option>
-            <option value="2">Cobrador</option>
-          </select>
-          <i class="fa-solid fa-angle-down"></i>
+    <div class="header-partner">
+      <div class="filters">
+        <div>
+          <span>Lugar de pago</span>
+          <div class="container-select">
+            <select id="collect">
+              <option value="1">Secretaría parroquial</option>
+              <option value="2">Cobrador</option>
+            </select>
+            <i class="fa-solid fa-angle-down"></i>
+          </div>
+        </div>
+        <div>
+          <span>Estado</span>
+          <div class="container-select">
+            <select id="status">
+              <option value="active">Activo</option>
+              <option value="pause">Pausado</option>
+            </select>
+            <i class="fa-solid fa-angle-down"></i>
+          </div>
         </div>
       </div>
-      <div>
-        <span>Estado</span>
-        <div class="container-select">
-          <select id="status">
-            <option value="active">Activo</option>
-            <option value="pause">Pausado</option>
-          </select>
-          <i class="fa-solid fa-angle-down"></i>
-        </div>
-      </div>
+      <div id="pagination" class="pagination"></div>
     </div>
     <div class="container-main">
       <div id="partner-list">
@@ -71,24 +77,40 @@
   </section>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+
       const currentdate = new Date()
 
       let partnerList = [];
       let collect = 1;
       let status = 'active';
 
+      let totalItems = 0
+      const itemsPerPage = 20
+      let currentOffset = 0
+      const maxPageButtons = 3
+
       const containerPartnerList = document.getElementById('partner-list');
       const partnerPaymentsContainer = document.getElementById('partner-payments');
       const collectSelect = document.getElementById('collect');
       const statusSelect = document.getElementById('status');
+      const paginationElement = document.getElementById('pagination')
 
-      const getPartners = async ({ collect, status }) => {
+      const getPartners = async ({ collect, status, offset }) => {
         partnerPaymentsContainer.innerHTML = ''
         partnerPaymentsContainer.style.display = 'none'
 
         try {
-          const results = await window.electronAPI.getPartners({ collect, status });
+          const results = await window.electronAPI.getPartners({ collect, status, offset });
           partnerList = results;
+
+          if (results.length != 0) {
+            totalItems = results[0].total_partners
+          } else {
+            totalItems = 0
+          }
+
+          updatePagination();
+
           renderPartnerList();
         } catch (error) {
           console.log(error);
@@ -186,11 +208,12 @@
 
             // Contenedor de opciones (inicialmente oculto)
             const divOptions = document.createElement('div');
-            divOptions.className = 'partner-options';
+            divOptions.classList.add('partner-options')
             divOptions.id = `options-${e.id}`;
             divOptions.style.display = 'none';
 
             // Botones dentro de las opciones
+
             const btnEdit = document.createElement('button');
             btnEdit.innerHTML = '<i class="fa-regular fa-pen-to-square"></i> Editar datos';
 
@@ -200,18 +223,30 @@
             const btnPause = document.createElement('button');
             btnPause.innerHTML = '<i class="fa-regular fa-clock"></i> Pausar';
 
-            const btnCancel = document.createElement('button');
-            btnCancel.innerHTML = '<i class="fa-regular fa-circle-xmark"></i> Cancelar';
+            const btnResume = document.createElement('button');
+            btnResume.innerHTML = '<i class="fa-regular fa-circle-xmark" style="transform: rotateZ(45deg)"></i> Reactivar';
 
-            // Agregar los botones al div de opciones
-            divOptions.appendChild(btnEdit);
-            divOptions.appendChild(btnGeneratePlan);
-            divOptions.appendChild(btnPause);
+            const btnCancel = document.createElement('button');
+            btnCancel.innerHTML = '<i class="fa-regular fa-circle-xmark"></i> Dar de baja';
+
+            if (e.status == 'active') {
+              divOptions.classList.add('partner-active-options')
+              divOptions.appendChild(btnEdit);
+              divOptions.appendChild(btnGeneratePlan);
+              divOptions.appendChild(btnPause);
+
+            } else {
+              divOptions.classList.add('partner-pause-options')
+              divOptions.appendChild(btnResume);
+            }
+
             divOptions.appendChild(btnCancel);
 
             // Agregar el botón de opciones y el div de opciones a la columna de acciones
             tdActions.appendChild(btnOptions);
             tdActions.appendChild(divOptions);
+
+            optionsPartner({ partner: e, btnCancel, btnPause, btnResume })
 
             // Finalmente, agregar todas las celdas a la fila (tr)
             tr.appendChild(tdName);
@@ -243,7 +278,6 @@
             });
           });
 
-
           document.querySelectorAll('td[data-id]').forEach(td => {
             td.addEventListener('click', (event) => {
               const memberId = event.target.closest('td').getAttribute('data-id');
@@ -251,7 +285,6 @@
             });
           });
 
-          // Función para cerrar todos los menús abiertos
           const closeAllMenus = () => {
             document.querySelectorAll('.partner-options').forEach(option => {
               option.style.display = 'none';
@@ -262,7 +295,6 @@
             });
           };
 
-          // Cerrar el menú si se hace clic fuera
           document.addEventListener('click', (event) => {
             if (!event.target.closest('.btn') && !event.target.closest('.partner-options')) {
               closeAllMenus();
@@ -274,7 +306,7 @@
 
       let currentId = ''
 
-      const loadPartnerPayments = async (id) => {
+      async function loadPartnerPayments(id) {
 
         if (currentId != id) {
           currentId = id
@@ -296,6 +328,18 @@
           const btnPaymentOption2 = document.createElement('button')
           const btnPaymentOption3 = document.createElement('button')
           const inputNewPayment = document.createElement('input')
+          const xMark = document.createElement('button')
+
+          xMark.innerHTML = '<i class="fa-solid fa-xmark"></i>'
+          xMark.classList.add('close-payments')
+
+          partnerPaymentsContainer.appendChild(xMark)
+
+          xMark.onclick = () => {
+            partnerPaymentsContainer.innerHTML = ''
+            partnerPaymentsContainer.style.display = 'none'
+            currentId = ''
+          }
 
           try {
             const response = await window.electronAPI.getPartnerPayments({ id, year })
@@ -367,7 +411,7 @@
               e.preventDefault()
               addPayment({ id, e })
               currentId = ''
-              getPartners({ collect: collectSelect.value, status: statusSelect.value })
+              getPartners({ collect: collectSelect.value, status: statusSelect.value, offset: currentOffset })
               loadPartnerPayments(id)
             }
 
@@ -416,18 +460,20 @@
 
       collectSelect.addEventListener('change', (e) => {
         collect = e.target.value;
-        getPartners({ collect, status });
+        currentOffset = 0
+        getPartners({ collect, status, offset: 0 });
       });
 
       statusSelect.addEventListener('change', (e) => {
         status = e.target.value;
-        getPartners({ collect, status });
+        currentOffset = 0
+        getPartners({ collect, status, offset: 0 });
       });
 
       window.electronAPI.updatePartnerList((_, collectValue) => {
         collect = collectValue;
         collectSelect.value = collect;
-        getPartners({ collect, status });
+        getPartners({ collect, status, offset: 0 });
       });
 
       const generateCalendar = (calendar, monthsPaid) => {
@@ -455,7 +501,134 @@
         }
       }
 
-      getPartners({ collect, status });
+      function updatePagination() {
+
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        const currentPage = Math.floor(currentOffset / itemsPerPage) + 1;
+
+        paginationElement.innerHTML = '';
+
+        const generatePageNumbers = () => {
+          let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+          let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+          if (endPage - startPage < maxPageButtons - 1) {
+            startPage = Math.max(1, endPage - maxPageButtons + 1);
+          }
+
+          const pages = [];
+          for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+          }
+          return pages;
+        };
+
+        const pageNumbers = generatePageNumbers();
+
+        // Botón "Anterior"
+        if (currentPage > 1) {
+          const prevButton = document.createElement('button');
+          prevButton.innerText = 'Anterior';
+          prevButton.onclick = () => onPageChange(currentOffset - itemsPerPage);
+          paginationElement.appendChild(prevButton);
+        }
+
+        // Páginas iniciales y "..."
+        if (pageNumbers[0] > 1) {
+          const firstPageButton = document.createElement('button');
+          firstPageButton.innerText = '1';
+          firstPageButton.onclick = () => onPageChange(0);
+          paginationElement.appendChild(firstPageButton);
+
+          if (pageNumbers[0] > 2) {
+            const dots = document.createElement('p');
+            dots.innerText = '...';
+            paginationElement.appendChild(dots);
+
+          }
+        }
+
+        // Botones de páginas
+        pageNumbers.forEach(page => {
+          const pageButton = document.createElement('button');
+          pageButton.innerText = page;
+          if (page === currentPage) {
+            pageButton.classList.add('page-active');
+          }
+          pageButton.onclick = () => onPageChange((page - 1) * itemsPerPage);
+          paginationElement.appendChild(pageButton);
+
+        });
+
+        // Páginas finales y "..."
+        if (pageNumbers[pageNumbers.length - 1] < totalPages) {
+          if (pageNumbers[pageNumbers.length - 1] < totalPages - 1) {
+            const dots = document.createElement('p');
+            dots.innerText = '...';
+            paginationElement.appendChild(dots);
+
+          }
+
+          const lastPageButton = document.createElement('button');
+          lastPageButton.innerText = totalPages;
+          lastPageButton.onclick = () => onPageChange((totalPages - 1) * itemsPerPage);
+          paginationElement.appendChild(lastPageButton);
+
+        }
+
+        // Botón "Siguiente"
+        if (currentPage < totalPages) {
+          const nextButton = document.createElement('button');
+          nextButton.innerText = 'Siguiente';
+          nextButton.onclick = () => onPageChange(currentOffset + itemsPerPage);
+          paginationElement.appendChild(nextButton);
+
+        }
+      };
+
+      function onPageChange(newOffset) {
+        currentOffset = newOffset;
+        updatePagination();
+        getPartners({ collect: collectSelect.value, status: statusSelect.value, offset: currentOffset })
+        // Aquí también puedes actualizar la vista de tus elementos, por ejemplo, cargando los nuevos datos
+      };
+
+      function optionsPartner({ partner, btnPause, btnResume, btnCancel }) {
+        btnPause.onclick = () => {
+          window.electronAPI.pausePartner(partner.id)
+          notification(`${partner.name} fue pausado`)
+          getPartners({ collect: collectSelect.value, status: statusSelect.value, offset: currentOffset });
+        }
+        btnResume.onclick = () => {
+          window.electronAPI.resumePartner(partner.id)
+          notification(`${partner.name} se reactivó`)
+          getPartners({ collect: collectSelect.value, status: statusSelect.value, offset: currentOffset });
+        }
+        btnCancel.onclick = () => {
+          window.electronAPI.openViewCancelPartner(partner)
+        }
+      }
+
+      function notification(text) {
+        Toastify({
+          text,
+          duration: 2000,
+          close: true,
+          newWindow: true,
+          gravity: "bottom",
+          position: "left",
+          stopOnFocus: true, // Prevents dismissing of toast on hover
+          style: {
+            background: "#000000cc",
+            color: "#fff",
+            border: "none ",
+            borderRadius: "5px",
+            boxShadow: "none"
+          },
+        }).showToast();
+      }
+
+      getPartners({ collect, status, offset: 0 });
 
     });
 
