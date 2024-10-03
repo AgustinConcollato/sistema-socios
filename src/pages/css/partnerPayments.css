@@ -9,6 +9,10 @@
     box-shadow: 0 5px 10px #00000010;
 }
 
+#partner-payments h3 {
+    text-transform: capitalize;
+}
+
 .close-payments {
     position: absolute;
     right: 10px;

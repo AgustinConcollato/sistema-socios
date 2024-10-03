@@ -35,17 +35,23 @@
             </div> -->
         <button class='btn' id="newPartner">+ Nuevo socio</button>
     </header>
-    <section>
+    <section class="section-payment-sheet">
         <h1>Planillas</h1>
-        <ul class="type-payment-sheet">
-            <li><button class="btn" id="btn-menu-generate">Generar planillas socios</button></li>
-            <li><button class="btn">Generar planilla para cobrador</button></li>
-            <ul class="payment-sheet-options" id="payment-sheet-options">
-                <li><button id="btn-secretariat">Secretaría</button></li>
-                <li><button id="btn-collect">Cobrador</button></li>
-                <li><button id="btn-all">Todas</button></li>
+        <div>
+            <ul class="type-payment-sheet">
+                <li><button class="btn" id="btn-menu-generate">Generar planillas socios</button></li>
+                <li><button class="btn">Generar planilla para cobrador</button></li>
+                <ul class="payment-sheet-options" id="payment-sheet-options">
+                    <li><button id="btn-secretariat">Secretaría</button></li>
+                    <li><button id="btn-collect">Cobrador</button></li>
+                    <li><button id="btn-all">Todas</button></li>
+                </ul>
             </ul>
-        </ul>
+            <input style="background: #f0f0f0;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;" type="number" placeholder="Monto minimo">
+        </div>
         <h3>vista previa</h3>
         <div id="container-previews">
             <p><span>Todavía no se generó ninguna planilla</span> <br> seleccionar una de las opciones de arriba</p>
@@ -62,6 +68,8 @@
             const containerPreviews = document.getElementById('container-previews')
 
             let menu = false
+            const iframe = document.createElement('iframe')
+            iframe.frameBorder = '0'
 
             btnMenuGenerate.addEventListener('click', () => {
                 menu = !menu
@@ -69,16 +77,38 @@
                 menu ? paymentSheetOptions.style.display = 'block' : paymentSheetOptions.style.display = 'none'
             })
 
-            paymentSheetOptions.addEventListener('click', () => {
-                menu = false
-                paymentSheetOptions.style.display = 'none'
+            document.addEventListener('click', () => {
+                if (!event.target.closest('#btn-menu-generate')) {
+                    menu = false
+                    paymentSheetOptions.style.display = 'none'
+                }
             })
 
-            btnSecretariat.addEventListener('click', () => alert())
+            btnSecretariat.addEventListener('click', () => {
+                generatePDF({ collect: 1, all: false, year: '2025', price: 3000, collectorName: null })
+            })
 
-            btnCollect.addEventListener('click', () => alert())
+            btnCollect.addEventListener('click', () => {
+                generatePDF({ collect: 2, all: false, year: '2025', price: 3000, collectorName: 'Holaa Nombre cobrador' })
+            })
 
-            btnAll.addEventListener('click', () => alert())
+            btnAll.addEventListener('click', () => {
+                generatePDF({ collect: 0, all: true, year: '2025', price: 3000, collectorName: 'Holaa Nombre cobrador' })
+            })
+
+
+            async function generatePDF({ collect, all, year, price, collectorName }) {
+                containerPreviews.innerHTML = ''
+                try {
+                    const response = await window.electronAPI.generatePDF({ collect, all, year, price, collectorName })
+
+                    iframe.src = response.pdf
+
+                    containerPreviews.appendChild(iframe)
+                } catch (error) {
+                    console.log(error)
+                }
+            }
 
         })
 

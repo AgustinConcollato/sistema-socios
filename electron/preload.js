@@ -51,5 +51,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     //////////////////// no se --- ayuda actualizar cosas en las vistas -- lo m
 
     notifySubscriberDetailUpdate: (e) => ipcRenderer.send('subscriber-detail-updated', e),
-    notifyPartnerListUpdate: (e) => ipcRenderer.send('partner-list-update', e)
+    notifyPartnerListUpdate: (e) => ipcRenderer.send('partner-list-update', e),
+
+
+    /////////////////// generar pdf --- planillas
+
+    generatePDF: (e) => ipcRenderer.invoke('payment-sheet', e)
 })

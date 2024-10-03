@@ -409,10 +409,12 @@
 
             form.onsubmit = (e) => {
               e.preventDefault()
-              addPayment({ id, e })
-              currentId = ''
-              getPartners({ collect: collectSelect.value, status: statusSelect.value, offset: currentOffset })
-              loadPartnerPayments(id)
+              if (e.target[0].value > 0) {
+                addPayment({ id, e })
+                currentId = ''
+                getPartners({ collect: collectSelect.value, status: statusSelect.value, offset: currentOffset })
+                loadPartnerPayments(id)
+              }
             }
 
             partnerPaymentsContainer.appendChild(form)
