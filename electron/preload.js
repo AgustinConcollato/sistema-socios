@@ -33,6 +33,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openViewPauseSubscriber: (e) => ipcRenderer.send('open-view-pause-subscriber', e),
     openViewResumeSubscriber: (e) => ipcRenderer.send('open-view-resume-subscriber', e),
     openViewCancelPartner: (e) => ipcRenderer.send('open-view-cancel-partner', e),
+    openViewPaymentSheet: (e) => ipcRenderer.send('open-view-payment-sheet', e),
 
     //////////////////// 
 
@@ -56,5 +57,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     /////////////////// generar pdf --- planillas
 
-    generatePDF: (e) => ipcRenderer.invoke('payment-sheet', e)
+    generatePDF: (e) => ipcRenderer.invoke('payment-sheet', e),
 })

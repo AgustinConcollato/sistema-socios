@@ -1,37 +1,39 @@
 const { ipcMain } = require("electron/main")
 const puppeteer = require("puppeteer")
 const db = require('../utils/database')
-const fs = require('fs')
-const path = require('path')
 
 ipcMain.handle('payment-sheet', async (_, args) => {
     try {
-        const response = await generatePDF(args)
+        const response = await generateAllPDF(args)
         return response
     } catch (error) {
         console.log(error)
     }
 })
 
-function generatePDF({ collect, all, year, price, collectorName }) {
+function generateAllPDF({ collect, all, year, price, collectorName, id }) {
 
     return new Promise((resolve, reject) => {
 
         let sql = ''
         let value = []
 
-        if (all) {
-            sql = `SELECT * FROM partner WHERE status = 'active'`
+        if (!id) {
+            if (all) {
+                sql = `SELECT * FROM partner WHERE status = 'active'`
+            } else {
+                sql = `
+                    SELECT *
+                    FROM partner
+                    WHERE collect = ?
+                    AND status = 'active';
+                `
+                value.push(collect)
+            }
         } else {
-            sql = `
-                SELECT *
-                FROM partner
-                WHERE collect = ?
-                AND status = 'active';
-            `
-            value.push(collect)
+            sql = 'SELECT * FROM partner WHERE id = ?'
+            value.push(id)
         }
-
 
         db.all(sql, value, async (error, results) => {
             if (error) {
@@ -188,7 +190,7 @@ function generatePDF({ collect, all, year, price, collectorName }) {
                                             <div style="width: 7.5cm;">
                                                 <p style="font-size: 14px">${e.address}</p>
                                                 <p style="font-size: 14px">${e.neighborhood || '---'}</p>
-                                                <div style="display: inline-flex; gap: 5px; align-items: center; font-size: 14px;">Valor minimo de la cuota <div class="cuadrado">$${price}</div></div>
+                                                <div style="margin-top: 15px; display: inline-flex; gap: 5px; align-items: center; font-size: 14px;">Valor cuota <div class="cuadrado">$${price}</div></div>
                                             </div>
                                             <ul class="meses">
                                                 <li> Enero

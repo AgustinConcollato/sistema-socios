@@ -39,7 +39,7 @@
         <input type="text" id="search" placeholder="Buscar por nombre, apellido o número de socio" />
         <div class="response"></div>
       </div> -->
-    <button class='btn' id="newPartner">+ Nuevo socio</button>
+    <button class='btn' id="new-partner">+ Nuevo socio</button>
   </header>
   <section>
     <h1>Socios</h1>
@@ -217,8 +217,8 @@
             const btnEdit = document.createElement('button');
             btnEdit.innerHTML = '<i class="fa-regular fa-pen-to-square"></i> Editar datos';
 
-            const btnGeneratePlan = document.createElement('button');
-            btnGeneratePlan.innerHTML = '<i class="fa-regular fa-file"></i> Generar planilla';
+            const btnGeneratePDF = document.createElement('button');
+            btnGeneratePDF.innerHTML = '<i class="fa-regular fa-file"></i> Generar planilla';
 
             const btnPause = document.createElement('button');
             btnPause.innerHTML = '<i class="fa-regular fa-clock"></i> Pausar';
@@ -232,7 +232,7 @@
             if (e.status == 'active') {
               divOptions.classList.add('partner-active-options')
               divOptions.appendChild(btnEdit);
-              divOptions.appendChild(btnGeneratePlan);
+              divOptions.appendChild(btnGeneratePDF);
               divOptions.appendChild(btnPause);
 
             } else {
@@ -246,7 +246,7 @@
             tdActions.appendChild(btnOptions);
             tdActions.appendChild(divOptions);
 
-            optionsPartner({ partner: e, btnCancel, btnPause, btnResume })
+            optionsPartner({ partner: e, btnCancel, btnPause, btnResume, btnGeneratePDF, btnEdit })
 
             // Finalmente, agregar todas las celdas a la fila (tr)
             tr.appendChild(tdName);
@@ -595,20 +595,26 @@
         // Aquí también puedes actualizar la vista de tus elementos, por ejemplo, cargando los nuevos datos
       };
 
-      function optionsPartner({ partner, btnPause, btnResume, btnCancel }) {
+      function optionsPartner({ partner, btnPause, btnResume, btnCancel, btnGeneratePDF, btnEdit }) {
+
         btnPause.onclick = () => {
           window.electronAPI.pausePartner(partner.id)
           notification(`${partner.name} fue pausado`)
           getPartners({ collect: collectSelect.value, status: statusSelect.value, offset: currentOffset });
         }
+
         btnResume.onclick = () => {
           window.electronAPI.resumePartner(partner.id)
           notification(`${partner.name} se reactivó`)
           getPartners({ collect: collectSelect.value, status: statusSelect.value, offset: currentOffset });
         }
+
         btnCancel.onclick = () => {
           window.electronAPI.openViewCancelPartner(partner)
         }
+
+        btnGeneratePDF.onclick = () => window.electronAPI.openViewPaymentSheet(partner)
+
       }
 
       function notification(text) {

@@ -37,3 +37,7 @@
     align-items: center;
     gap: 10px;
 }
+
+#form-new-amount input:focus {
+    outline-color: #385f99;
+}

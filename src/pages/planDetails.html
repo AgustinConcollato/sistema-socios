@@ -30,7 +30,7 @@
             <ul>
                 <li><a href='./index.html'>Socios</a></li>
                 <li><a href='./debitAutomatic.html'>Débito automático</a></li>
-                <li><a href='./payroll.html'>Planillas</a></li>
+                <li><a href='./paymentSheet.html'>Planillas</a></li>
             </ul>
         </nav>
         <!-- <div class="searcher">
@@ -40,7 +40,7 @@
             <input type="text" id="search" placeholder="Buscar por nombre, apellido o número de socio" />
             <div class="response"></div>
         </div> -->
-        <button class='btn' id="newPartner">+ Nuevo socio</button>
+        <button class='btn' id="new-partner">+ Nuevo socio</button>
     </header>
     <section>
         <div class="header-plan">
@@ -144,7 +144,7 @@
 
                         tableSubscribers.appendChild(tbody)
                     } else {
-                        containerResults.innerHTML = `<p>No hay socios ${subscriberStatus.value != 'pause' ? 'pausados' : 'activos'}</p>`
+                        containerResults.innerHTML = `<p>No hay socios ${subscriberStatus.value == 'paused' ? 'pausados' : 'activos'}</p>`
                     }
 
 

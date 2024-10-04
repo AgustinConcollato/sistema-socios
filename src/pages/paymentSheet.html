@@ -33,28 +33,40 @@
                 <input type="text" id="search" placeholder="Buscar por nombre, apellido o número de socio" />
                 <div class="response"></div>
             </div> -->
-        <button class='btn' id="newPartner">+ Nuevo socio</button>
+        <button class='btn' id="new-partner">+ Nuevo socio</button>
     </header>
     <section class="section-payment-sheet">
-        <h1>Planillas</h1>
         <div>
+            <h1>Planillas</h1>
             <ul class="type-payment-sheet">
-                <li><button class="btn" id="btn-menu-generate">Generar planillas socios</button></li>
+                <li class="btn-menu-generate">
+                    <button class="btn" id="btn-menu-generate">Generar planillas socios</button>
+                    <ul class="payment-sheet-options" id="payment-sheet-options">
+                        <li><button id="btn-secretariat">Secretaría</button></li>
+                        <li><button id="btn-collect">Cobrador</button></li>
+                        <li><button id="btn-all">Todas</button></li>
+                    </ul>
+                </li>
                 <li><button class="btn">Generar planilla para cobrador</button></li>
-                <ul class="payment-sheet-options" id="payment-sheet-options">
-                    <li><button id="btn-secretariat">Secretaría</button></li>
-                    <li><button id="btn-collect">Cobrador</button></li>
-                    <li><button id="btn-all">Todas</button></li>
-                </ul>
             </ul>
-            <input style="background: #f0f0f0;
-            padding: 10px 20px;
-            border-radius: 5px;
-            border: none;" type="number" placeholder="Monto minimo">
+            <div class="more-options">
+                <span>Más opciones</span>
+                <div>
+                    <label for="min-amount">Valor cuota</label>
+                    <input type="number" id="min-amount" placeholder="Valor cuota">
+                </div>
+                <div>
+                    <label for="year">Año</label>
+                    <input type="text" id="year" placeholder="Año">
+                </div>
+                <div>
+                    <label for="collector-name">Nombre del cobrador/a</label>
+                    <input type="text" id="collector-name" placeholder="Nombre del cobrador/a">
+                </div>
+            </div>
         </div>
-        <h3>vista previa</h3>
         <div id="container-previews">
-            <p><span>Todavía no se generó ninguna planilla</span> <br> seleccionar una de las opciones de arriba</p>
+            <p><span>Vista previa</span><br>Todavía no se generó ninguna planilla</p>
         </div>
     </section>
     <script>
@@ -85,19 +97,24 @@
             })
 
             btnSecretariat.addEventListener('click', () => {
-                generatePDF({ collect: 1, all: false, year: '2025', price: 3000, collectorName: null })
+                generatePDF({ collect: 1, all: false })
             })
 
             btnCollect.addEventListener('click', () => {
-                generatePDF({ collect: 2, all: false, year: '2025', price: 3000, collectorName: 'Holaa Nombre cobrador' })
+                generatePDF({ collect: 2, all: false })
             })
 
             btnAll.addEventListener('click', () => {
-                generatePDF({ collect: 0, all: true, year: '2025', price: 3000, collectorName: 'Holaa Nombre cobrador' })
+                generatePDF({ collect: 0, all: true })
             })
 
 
-            async function generatePDF({ collect, all, year, price, collectorName }) {
+            async function generatePDF({ collect, all }) {
+
+                const price = document.getElementById('min-amount').value || 3000
+                const year = document.getElementById('year').value || (new Date().getFullYear() + 1)
+                const collectorName = document.getElementById('collector-name').value || 'Caglieris, Carla'
+
                 containerPreviews.innerHTML = ''
                 try {
                     const response = await window.electronAPI.generatePDF({ collect, all, year, price, collectorName })

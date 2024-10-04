@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./css/paymentSheet.css">
+</head>
+
+<body style="padding: 10px; display: flex; gap: 20px;">
+    <div class="more-options" style="min-width: 250px">
+        <span>Más opciones</span>
+        <div>
+            <label for="min-amount">Valor cuota</label>
+            <input type="number" id="min-amount" placeholder="Valor cuota">
+        </div>
+        <div>
+            <label for="year">Año</label>
+            <input type="text" id="year" placeholder="Año">
+        </div>
+        <div>
+            <label for="collector-name">Nombre del cobrador/a</label>
+            <input type="text" id="collector-name" placeholder="Nombre del cobrador/a">
+        </div>
+        <div class="btn" id="btn-regenerate">Volver a generar</div>
+    </div>
+    <div id="container-pdf"></div>
+    <script>
+        window.electronAPI.onReceivePartner(async (_, partner) => {
+            document.title = `Planilla de ${partner.name}`
+
+            const containerPreviews = document.getElementById('container-pdf')
+            const btnRegenerate = document.getElementById('btn-regenerate')
+
+
+            const iframe = document.createElement('iframe')
+            iframe.frameBorder = '0'
+
+            async function generatePDF({ collect, all, id }) {
+
+                const price = document.getElementById('min-amount').value || 3000
+                const year = document.getElementById('year').value || (new Date().getFullYear() + 1)
+                const collectorName = document.getElementById('collector-name').value || 'Caglieris, Carla'
+
+                containerPreviews.innerHTML = ''
+
+                try {
+                    const response = await window.electronAPI.generatePDF({ collect, all, year, price, collectorName, id })
+
+                    iframe.src = response.pdf
+
+                    containerPreviews.appendChild(iframe)
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+
+            btnRegenerate.addEventListener('click', () => {
+
+                generatePDF({ collect: 0, all: false, id: partner.id })
+            })
+
+            generatePDF({ collect: 0, all: false, id: partner.id })
+        })
+    </script>
+</body>
+
+</html>

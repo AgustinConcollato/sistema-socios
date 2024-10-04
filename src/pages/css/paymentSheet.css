@@ -1,24 +1,27 @@
 .section-payment-sheet {
-    height: calc(100vh - 62px);
+    display: flex;
+    gap: 20px;
 }
 
 .type-payment-sheet {
+    flex-direction: column;
     display: flex;
+    align-items: start;
     gap: 10px;
-    position: relative;
     margin: 30px 0;
+    width: 250px;
+}
+
+.btn-menu-generate {
+    position: relative;
 }
 
 .payment-sheet-options {
     position: absolute;
-    left: 0;
-    top: calc(100% + 10px);
-}
-
-.payment-sheet-options {
+    left: calc(100% + 10px);
+    top: 0;
     width: 180px;
     background: #fff;
-    border-radius: 5px;
     border: 1px solid #eee;
     box-shadow: 0 5px 10px #00000020;
     border-radius: 10px;
@@ -45,26 +48,65 @@
     border-bottom: 1px solid #eee;
 }
 
-#container-previews {
-    height: 100%;
+.more-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-#container-previews p {
-    padding: 20px;
-    border-radius: 10px;
+.more-options span {
+    font-weight: 600;
+}
+
+.more-options label {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.more-options input {
+    background: #f0f0f0;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: none;
+    width: 100%;
+}
+
+.more-options input:focus {
+    outline-color: #385f99;
+}
+
+.more-options .btn {
+    background: #385f99;
+    color: #fff;
+    text-align: center;
+    margin-top: 20px;
+}
+
+#container-previews {
+    width: 100%;
+    height: calc(100vh - 110px);
     background: #f0f0f0;
     text-align: center;
-    margin-top: 30px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #aaa;
 }
 
 #container-previews p span {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 600;
 }
 
 iframe {
     width: 100%;
     height: 100%;
-    margin-bottom: 20px;
     border-radius: 10px;
+}
+
+#container-pdf {
+    width: 100%;
+    height: calc(100vh - 20px);
 }

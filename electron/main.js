@@ -100,7 +100,7 @@ function createWindow() {
                 pauseSubscriber.webContents.send('send-subscriber-id', e);
             });
     });
-    
+
     ipcMain.on('open-view-resume-subscriber', (_, e) => {
         const resumeSubscriber = new BrowserWindow({
             width: 600,
@@ -149,6 +149,25 @@ function createWindow() {
     ipcMain.on('partner-list-update', (_, e) => {
         win.webContents.send('update-partner-list', e.collect);
     });
+
+    ipcMain.on('open-view-payment-sheet', (_, e) => {
+        const paymentSheet = new BrowserWindow({
+            width: 1100,
+            height: 700,
+            minWidth: 1100,
+            minHeight: 700,
+            modal: true,
+            fullscreenable: true,
+            webPreferences: {
+                preload: path.join(__dirname, 'preload.js')
+            },
+        });
+
+        paymentSheet.loadFile('./src/pages/partnerPaymentSheet.html')
+            .then(() => {
+                paymentSheet.webContents.send('send-partner', e);
+            });
+    })
 }
 
 app.on('ready', () => {

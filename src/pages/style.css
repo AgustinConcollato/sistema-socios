@@ -44,6 +44,10 @@ header p {
     transform: scale(0.97);
 }
 
+select:focus {
+    outline-color: #385F99;
+}
+
 .loading {
     margin-top: 20px;
     border: 4px solid #eee;
