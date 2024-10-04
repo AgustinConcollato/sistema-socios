@@ -23,6 +23,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     pausePartner: (e) => ipcRenderer.invoke('pause-partner', e),
     resumePartner: (e) => ipcRenderer.invoke('resume-partner', e),
     cancelPartner: (e) => ipcRenderer.invoke('cancel-partner', e),
+    editPartner: (e) => ipcRenderer.invoke('edit-partner', e),
     addPartnerPayment: (e) => ipcRenderer.invoke('add-payment', e),
 
     //////////////////// abrir nuevas ventanas
@@ -33,6 +34,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openViewPauseSubscriber: (e) => ipcRenderer.send('open-view-pause-subscriber', e),
     openViewResumeSubscriber: (e) => ipcRenderer.send('open-view-resume-subscriber', e),
     openViewCancelPartner: (e) => ipcRenderer.send('open-view-cancel-partner', e),
+    openViewEditPartner: (e) => ipcRenderer.send('open-view-edit-partner', e),
     openViewPaymentSheet: (e) => ipcRenderer.send('open-view-payment-sheet', e),
 
     //////////////////// 

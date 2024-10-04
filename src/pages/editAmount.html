@@ -16,7 +16,7 @@
     <script>
         window.electronAPI.onReceiveSubscriberId((_, sub) => {
 
-            const body = document.getElementsByTagName('body')[0];
+            const body = document.body;
 
             document.title = `Modificar monto de ${sub.payer_first_name} ${sub.payer_last_name}`
 

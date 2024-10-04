@@ -90,7 +90,7 @@
 
 .calendar {
     display: grid;
-    grid-template-columns: 100px 100px 100px;
+    grid-template-columns: repeat(4, 60px);
     gap: 10px;
 }
 

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./css/editPartner.css">
+</head>
+
+<body>
+    <script>
+        window.electronAPI.onReceivePartner((_, partner) => {
+
+            const { id, name, address, collect, neighborhood, contact, member_number } = partner
+
+            const body = document.body
+            const form = document.createElement('form')
+
+            form.innerHTML = `
+                <form>
+                    <div>
+                        <span>Nombre actual: ${name}</span>
+                        <input type="text" name="name" placeholder="Nuevo nombre">
+                    </div>
+                    <div>
+                        <span>Dirección actual: ${address}</span>
+                        <input type="text" name="address" placeholder="Nueva dirección">
+                    </div>
+                    <div>
+                        <span>Barrio actual: ${neighborhood}</span>
+                        <input type="text" name="neighborhood" placeholder="Nuevo barrio">
+                    </div>
+                    <div>
+                        <span>Contacto actual: ${contact}</span>
+                        <input type="text" name="contact"  placeholder="Nuevo contacto (correo / teléfono)">
+                    </div>
+                    <div>
+                        <span style="display: block; margin:15px 0 10px;">Lugar de cobro</span>
+                        <div>
+                            <input type="radio" name="collect" value="1" ${collect == '1' ? 'checked' : ''} id="collect1" required>
+                            <label for="collect1">Secretaría parroquial</label>
+                        </div>
+                        <div>
+                            <input type="radio" name="collect" value="2" ${collect == '2' ? 'checked' : ''} id="collect2">
+                            <label for="collect2">Cobrador</label>
+                        </div>
+                    </div>
+                    <div class="container-btn">
+                        <button type="button" id="btn-cancel" class="btn">Cancelar</button>
+                        <button type="submit" class="btn btn-edit">Editar datos</button>
+                    </div>
+                </form>
+            `
+
+            form.onsubmit = async (e) => {
+                e.preventDefault()
+                const formData = new FormData(e.target)
+                const formObject = {}
+
+                formData.forEach((value, key) => {
+                    formObject[key] = value == '' ? null : value;
+                });
+
+                try {
+                    const response = await window.electronAPI.editPartner({ id: partner.id, updateData: formObject })
+                    if (response.status == 'success') {
+                        window.electronAPI.notifyPartnerListUpdate(formObject);
+                        window.close()
+                    }
+                } catch (error) {
+
+                }
+            }
+
+            body.innerHTML = `
+                <h1>Editar datos de <span>${name}</span></h1>
+                <p>Número de socio: ${member_number}</p>
+
+            `
+            body.appendChild(form)
+
+            const btnCancel = document.getElementById('btn-cancel')
+
+            btnCancel.onclick = () => window.close()
+        })
+    </script>
+</body>
+
+</html>

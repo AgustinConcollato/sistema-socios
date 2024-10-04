@@ -1,0 +1,67 @@
+body {
+    padding: 20px;
+}
+
+h1 {
+    font-size: 24px;
+}
+
+h1 span {
+    text-transform: capitalize;
+}
+
+p {
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+form>div span {
+    display: block;
+}
+
+form input[type="text"] {
+    border-radius: 5px;
+    padding: 10px 15px;
+    background: #f0f0f0;
+    border: none;
+    margin-top: 5px;
+    width: 100%;
+}
+
+form input:focus {
+    outline-color: #385f99;
+}
+
+form input[type="radio"] {
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+label {
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.container-btn {
+    display: flex;
+    gap: 15px;
+    margin: 0;
+    width: 100%;
+    position: fixed;
+    justify-content: end;
+    bottom: 0;
+    right: 0;
+    padding: 10px 20px 20px 0;
+    height: 70px;
+    background: #fff;
+}
+
+.btn-edit {
+    background: #385f99;
+    color: #fff;
+}

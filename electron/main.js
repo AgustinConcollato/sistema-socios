@@ -33,7 +33,7 @@ function createWindow() {
                 preload: path.join(__dirname, 'preload.js')
             },
         });
-        formNewPartner.loadFile('./src/pages/addPartner/addPartner.html');
+        formNewPartner.loadFile('./src/pages/addPartner.html');
     });
 
     let subscriberDetail;
@@ -67,7 +67,7 @@ function createWindow() {
             modal: true,
             parent: subscriberDetail,
             minimizable: false,
-            fullscreenable: true,
+            resizable: false,
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },
@@ -89,7 +89,7 @@ function createWindow() {
             modal: true,
             parent: subscriberDetail,
             minimizable: false,
-            fullscreenable: true,
+            resizable: false,
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },
@@ -110,7 +110,7 @@ function createWindow() {
             modal: true,
             parent: subscriberDetail,
             minimizable: false,
-            fullscreenable: true,
+            resizable: false,
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },
@@ -130,7 +130,7 @@ function createWindow() {
             minHeight: 350,
             modal: true,
             minimizable: false,
-            fullscreenable: true,
+            resizable: false,
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },
@@ -142,13 +142,22 @@ function createWindow() {
             });
     });
 
-    ipcMain.on('subscriber-detail-updated', (_, newData) => {
-        subscriberDetail.webContents.send('update-view-subscribed-detail', newData);
-    });
+    ipcMain.on('open-view-edit-partner', (_, e) => {
+        const editPartner = new BrowserWindow({
+            width: 550,
+            height: 700,
+            modal: true,
+            resizable: false,
+            webPreferences: {
+                preload: path.join(__dirname, 'preload.js')
+            },
+        });
 
-    ipcMain.on('partner-list-update', (_, e) => {
-        win.webContents.send('update-partner-list', e.collect);
-    });
+        editPartner.loadFile('./src/pages/editPartner.html')
+            .then(() => {
+                editPartner.webContents.send('send-partner', e);
+            });
+    })
 
     ipcMain.on('open-view-payment-sheet', (_, e) => {
         const paymentSheet = new BrowserWindow({
@@ -168,6 +177,14 @@ function createWindow() {
                 paymentSheet.webContents.send('send-partner', e);
             });
     })
+
+    ipcMain.on('subscriber-detail-updated', (_, newData) => {
+        subscriberDetail.webContents.send('update-view-subscribed-detail', newData);
+    });
+
+    ipcMain.on('partner-list-update', (_, e) => {
+        win.webContents.send('update-partner-list', e.collect);
+    });
 }
 
 app.on('ready', () => {

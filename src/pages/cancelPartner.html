@@ -13,7 +13,7 @@
         window.electronAPI.onReceivePartner((_, partner) => {
             document.title = `Dar de baja a ${partner.name}`
 
-            const body = document.getElementsByTagName('body')[0];
+            const body = document.body;
 
             const h2 = document.createElement('h2')
             const p = document.createElement('p')

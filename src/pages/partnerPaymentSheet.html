@@ -11,7 +11,7 @@
 
 <body style="padding: 10px; display: flex; gap: 20px;">
     <div class="more-options" style="min-width: 250px">
-        <span>Más opciones</span>
+        <span>Opciones</span>
         <div>
             <label for="min-amount">Valor cuota</label>
             <input type="number" id="min-amount" placeholder="Valor cuota">
@@ -57,10 +57,7 @@
                 }
             }
 
-            btnRegenerate.addEventListener('click', () => {
-
-                generatePDF({ collect: 0, all: false, id: partner.id })
-            })
+            btnRegenerate.addEventListener('click', () => generatePDF({ collect: 0, all: false, id: partner.id }))
 
             generatePDF({ collect: 0, all: false, id: partner.id })
         })

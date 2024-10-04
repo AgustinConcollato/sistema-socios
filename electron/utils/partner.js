@@ -54,6 +54,19 @@ ipcMain.handle('cancel-partner', async (_, args) => {
     }
 });
 
+ipcMain.handle('edit-partner', async (_, args) => {
+
+    const partnerInstance = new Partner();
+
+    try {
+        const response = await partnerInstance.edit(args);
+        return response;
+    } catch (error) {
+        console.error(error);
+        return { status: "error", message: error.message };
+    }
+});
+
 class Partner {
     constructor(parameters) { }
 
@@ -132,5 +145,25 @@ class Partner {
                 });
             });
         });
+    }
+
+    edit({ id, updateData }) {
+        const columns = Object.keys(updateData).filter(key => updateData[key] !== null && updateData[key] !== undefined);
+
+        const sql = `UPDATE partner SET ${columns.map(col => `${col} = ?`).join(', ')} WHERE id = ?`;
+
+        const values = columns.map(col => updateData[col]);
+
+        values.push(id);
+
+        return new Promise((resolve, reject) => {
+            db.run(sql, values, function (err) {
+                if (err) {
+                    reject(err.message);
+                } else {
+                    resolve({ changes: this.changes, status: "success" });
+                }
+            });
+        })
     }
 }

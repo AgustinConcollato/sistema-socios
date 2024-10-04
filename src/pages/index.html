@@ -242,19 +242,16 @@
 
             divOptions.appendChild(btnCancel);
 
-            // Agregar el botón de opciones y el div de opciones a la columna de acciones
             tdActions.appendChild(btnOptions);
             tdActions.appendChild(divOptions);
 
             optionsPartner({ partner: e, btnCancel, btnPause, btnResume, btnGeneratePDF, btnEdit })
 
-            // Finalmente, agregar todas las celdas a la fila (tr)
             tr.appendChild(tdName);
             tr.appendChild(tdPayment);
             tr.appendChild(tdPaymentStatus);
             tr.appendChild(tdActions);
 
-            // Agregar la fila al cuerpo de la tabla
             partnerTableBody.appendChild(tr);
           });
 
@@ -486,14 +483,14 @@
           if (monthsPaid[i] == i) {
             const divMonthPaid = document.createElement('div')
             divMonthPaid.innerHTML = `  
-              <span>${month[i]}</span>
+              <span>${month[i].slice(0, 3)}.</span>
               <div style="background: #519819;"><i class="fa-solid fa-check"></i></div>
             `
             calendar.appendChild(divMonthPaid)
           } else {
             const divUnpaidMonth = document.createElement('div')
             divUnpaidMonth.innerHTML = `  
-              <span>${month[i]}</span>
+              <span>${month[i].slice(0, 3)}.</span>
               <div></div>
             `
             calendar.appendChild(divUnpaidMonth)
@@ -615,6 +612,7 @@
 
         btnGeneratePDF.onclick = () => window.electronAPI.openViewPaymentSheet(partner)
 
+        btnEdit.onclick = () => window.electronAPI.openViewEditPartner(partner)
       }
 
       function notification(text) {
