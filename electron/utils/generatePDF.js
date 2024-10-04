@@ -166,14 +166,14 @@ function generateAllPDF({ collect, all, year, price, collectorName, id }) {
                                     .cuadrado {
                                         border: 1px solid #000;
                                         height: 0.6cm;
-                                        width: 1.5cm;
+                                        min-width: 1.5cm;
                                         font-size: 14px;
                                         display: flex;
                                         justify-content: center;
                                         align-items: center;
                                     }
                                 </style>
-                                <title>Planillas del ${year}</title>
+                                <title>${id ? 'Planilla de ' + results[0].name : 'Planillas del ' + year}</title>
                             </head>
 
                             <body>
