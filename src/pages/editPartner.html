@@ -29,11 +29,11 @@
                         <input type="text" name="address" placeholder="Nueva dirección">
                     </div>
                     <div>
-                        <span>Barrio actual: ${neighborhood}</span>
+                        <span>Barrio actual: ${neighborhood || '---'}</span>
                         <input type="text" name="neighborhood" placeholder="Nuevo barrio">
                     </div>
                     <div>
-                        <span>Contacto actual: ${contact}</span>
+                        <span>Contacto actual: ${contact || '---'}</span>
                         <input type="text" name="contact"  placeholder="Nuevo contacto (correo / teléfono)">
                     </div>
                     <div>

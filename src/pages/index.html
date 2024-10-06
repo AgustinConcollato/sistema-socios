@@ -83,6 +83,7 @@
       let partnerList = [];
       let collect = 1;
       let status = 'active';
+      let currentId = ''
 
       let totalItems = 0
       const itemsPerPage = 20
@@ -110,7 +111,7 @@
           }
 
           updatePagination();
-
+          currentId = ''
           renderPartnerList();
         } catch (error) {
           console.log(error);
@@ -242,8 +243,15 @@
 
             divOptions.appendChild(btnCancel);
 
+            const btnDetail = document.createElement('button')
+            btnDetail.className = 'btn'
+            btnDetail.innerText = 'Ver detalles'
+
+            tdActions.appendChild(btnDetail);
             tdActions.appendChild(btnOptions);
             tdActions.appendChild(divOptions);
+
+            btnDetail.onclick = () => window.electronAPI.openViewPartnerDetail(e)
 
             optionsPartner({ partner: e, btnCancel, btnPause, btnResume, btnGeneratePDF, btnEdit })
 
@@ -301,7 +309,6 @@
 
       };
 
-      let currentId = ''
 
       async function loadPartnerPayments(id) {
 
@@ -314,7 +321,6 @@
           const year = currentdate.getFullYear().toString()
 
           const parnterName = document.createElement('h3')
-          const memberNumber = document.createElement('span')
           const subtitle = document.createElement('h4')
           const form = document.createElement('form')
           const div = document.createElement('div')
@@ -344,7 +350,6 @@
             const { partner, payments } = response
 
             parnterName.innerText = partner.name
-            memberNumber.innerText = `Número de socio: ${partner.memberNumber}`
             subtitle.innerText = `Pagos del año ${year}`
 
             month = [
@@ -381,7 +386,6 @@
             btnPaymentOption3.innerText = '$10.000'
 
             partnerPaymentsContainer.appendChild(parnterName)
-            partnerPaymentsContainer.appendChild(memberNumber)
 
             div.appendChild(inputNewPayment)
             div.appendChild(btnNewPayment)

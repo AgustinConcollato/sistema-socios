@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./css/partnerDetail.css">
+    <script src="../scripts/formatNumber.js"></script>
+</head>
+
+<body>
+    <div id="info-partner"></div>
+    <div id="info-payments"></div>
+    <script>
+        const month = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+
+        window.electronAPI.onReceivePartner(async (_, args) => {
+
+            const infoPartner = document.getElementById('info-partner')
+            const infoPayments = document.getElementById('info-payments')
+
+            const currentdate = new Date()
+            let year = currentdate.getFullYear()
+
+            const { id, name, address, collect, neighborhood, contact, member_number, date, status } = args
+
+            const response = await window.electronAPI.getPartnerPayments({ id, year: year.toString() })
+
+            const { partner, payments } = response
+
+            console.log(response)
+
+            infoPartner.innerHTML = `
+                <h3>${name}</h3>
+                <span>Número de socio: ${member_number}</span>
+            `
+
+            infoPayments.innerHTML = `
+                <h3>Pagos del año ${year}</h3>
+            `
+
+            if (payments.length === 0) {
+                infoPayments.innerHTML += `<p >No hay pagos registrados del año ${year}</p>`
+                return
+            }
+
+            let monthsPaid = []
+            const calendar = document.createElement('ul')
+            calendar.className = 'calendar'
+
+            payments.forEach(payment => {
+                const paymentDate = new Date(payment.payment_date)
+                monthsPaid[paymentDate.getMonth()] = { num: paymentDate.getMonth(), amount: payment.amount }
+            })
+
+            console.log(monthsPaid)
+
+            generateCalendar(calendar, monthsPaid)
+            infoPayments.appendChild(calendar)
+        })
+
+        const generateCalendar = (calendar, monthsPaid) => {
+            let i = 0
+
+
+            while (i < 12) {
+                if (monthsPaid[i]?.num == i) {
+                    const divMonthPaid = document.createElement('li')
+                    divMonthPaid.innerHTML = `<span>${month[i]}</span><b>$${formatNumber(monthsPaid[i].amount)}</b>`
+                    calendar.appendChild(divMonthPaid)
+                } else {
+                    const divUnpaidMonth = document.createElement('li')
+                    divUnpaidMonth.innerHTML = `<span>${month[i]}</span> No pagado`
+                    calendar.appendChild(divUnpaidMonth)
+                }
+
+                i++
+            }
+
+            calendar.innerHTML += `<li><b>Total</b><b>$${formatNumber(monthsPaid.reduce((accumulator, currentValue) => accumulator + currentValue.amount, 0))}</b></li>`
+        }
+    </script>
+</body>
+
+</html>

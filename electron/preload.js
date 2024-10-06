@@ -36,6 +36,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openViewCancelPartner: (e) => ipcRenderer.send('open-view-cancel-partner', e),
     openViewEditPartner: (e) => ipcRenderer.send('open-view-edit-partner', e),
     openViewPaymentSheet: (e) => ipcRenderer.send('open-view-payment-sheet', e),
+    openViewPartnerDetail: (e) => ipcRenderer.send('open-view-partner-detail', e),
 
     //////////////////// 
 

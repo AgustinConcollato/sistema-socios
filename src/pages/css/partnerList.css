@@ -55,7 +55,6 @@
 }
 
 .partners-table tbody tr td {
-    border-bottom: 1px solid #eee;
     padding: 10px;
     height: 70px;
     cursor: pointer;
@@ -83,7 +82,6 @@
 
 #partner-table-body tr td:last-child {
     padding: 10px;
-    border-bottom: 1px solid #eee;
     position: relative;
     cursor: auto;
 }
@@ -92,9 +90,10 @@
     border: none;
 }
 
-#partner-table-body tr td:last-child>button {
+#partner-table-body tr td:last-child>button:nth-child(2) {
     height: 40px;
     width: 40px;
+    margin-left: 10px;
 }
 
 #partner-table-body tr:last-child .partner-active-options {
@@ -115,7 +114,7 @@
 
 .partner-options {
     position: absolute;
-    left: -165px;
+    left: -50px;
     top: 20px;
     width: 170px;
     display: flex;

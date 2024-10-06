@@ -7,7 +7,7 @@ ipcMain.handle('get-partner-payments', async (_, args) => {
 
     return new Promise((resolve, reject) => {
         sql = `
-    SELECT p.name, p.member_number, pay.*
+    SELECT p.*, pay.*
     FROM partner p
     LEFT JOIN payments pay 
         ON p.id = pay.partner_id 
@@ -21,10 +21,7 @@ ipcMain.handle('get-partner-payments', async (_, args) => {
                 reject(error.message)
             } else {
                 if (results.length > 0) {
-                    const partner = {
-                        name: results[0].name,
-                        memberNumber: results[0].member_number
-                    };
+                    const partner = results[0]
 
                     const payments = results
                         .filter(row => row.payment_date)

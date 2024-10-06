@@ -178,6 +178,25 @@ function createWindow() {
             });
     })
 
+    ipcMain.on('open-view-partner-detail', (_, e) => {
+        const paymentSheet = new BrowserWindow({
+            width: 1100,
+            height: 700,
+            minWidth: 1100,
+            minHeight: 700,
+            modal: true,
+            resizable: false,
+            webPreferences: {
+                preload: path.join(__dirname, 'preload.js')
+            },
+        });
+
+        paymentSheet.loadFile('./src/pages/partnerDetail.html')
+            .then(() => {
+                paymentSheet.webContents.send('send-partner', e);
+            });
+    })
+
     ipcMain.on('subscriber-detail-updated', (_, newData) => {
         subscriberDetail.webContents.send('update-view-subscribed-detail', newData);
     });

@@ -1,6 +1,10 @@
 const { ipcMain } = require("electron/main")
 const puppeteer = require("puppeteer")
 const db = require('../utils/database')
+const path = require('path');
+const fs = require('fs');
+const os = require('os');
+const { shell } = require('electron');
 
 ipcMain.handle('payment-sheet', async (_, args) => {
     try {
@@ -258,27 +262,60 @@ function generateAllPDF({ collect, all, year, price, collectorName, id }) {
                     </html>
                 `
 
-                const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
-                const page = await browser.newPage()
-                await page.setContent(htmlContent, { waitUntil: 'load' })
+                try {
+                    const browser = await puppeteer.launch({
+                        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+                    });
+                    const page = await browser.newPage();
+                    await page.setContent(htmlContent, { waitUntil: 'load' });
 
-                const pdfBuffer = await page.pdf({
-                    format: 'A4',
-                    printBackground: true,
-                    margin: {
-                        top: '0.5cm',
-                        bottom: '0.5cm',
-                        left: '0.5cm',
-                        right: '0.5cm'
-                    }
-                });
+                    const pdfBuffer = await page.pdf({
+                        format: 'A4',
+                        printBackground: true,
+                        margin: {
+                            top: '0.5cm',
+                            bottom: '0.5cm',
+                            left: '0.5cm',
+                            right: '0.5cm'
+                        }
+                    });
 
-                const pdfBase64 = `data:application/pdf;base64,${Buffer.from(pdfBuffer).toString('base64')}`
+                    await browser.close();
 
-                await browser.close();
+                    const tempDir = os.tmpdir();
+                    const pdfFilename = `${id ? 'Planilla de ' + results[0].name : 'Planillas del ' + year}-${Date.now()}.pdf`;
+                    const pdfPath = path.join(tempDir, pdfFilename);
 
-                resolve({ pdf: pdfBase64, status: 'success' });
+                    console.log(pdfPath)
+                    // Escribir el buffer del PDF en el archivo
+                    fs.writeFile(pdfPath, pdfBuffer, (err) => {
+                        if (err) {
+                            reject(err.message);
+                        } else {
+                            resolve({ pdf: pdfPath, status: 'success' });
+                        }
+                    });
+
+                    deletePDF(pdfPath)
+
+                } catch (err) {
+                    reject(err.message);
+                }
+
+
             }
         })
     })
+}
+
+async function deletePDF(pdfPath) {
+    setTimeout(() => {
+        fs.unlink(pdfPath, (err) => {
+            if (err) {
+                console.error(`Error al eliminar el archivo temporal: ${err.message}`);
+            } else {
+                console.log('Archivo temporal eliminado.');
+            }
+        });
+    }, 8000)
 }
