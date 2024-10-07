@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getSubscriberDetail: (e) => ipcRenderer.invoke('get-subscriber-detail', e),
     pauseSubscriber: (e) => ipcRenderer.invoke('pause-subscriber', e),
     resumeSubscriber: (e) => ipcRenderer.invoke('resume-subscriber', e),
+    cancelSubscriber: (e) => ipcRenderer.invoke('cancel-subscriber', e),
 
     ///////////////////// obtener info socios fuera de Mercado Pago
 
@@ -33,6 +34,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openViewEditAmount: (e) => ipcRenderer.send('open-view-edit-amount', e),
     openViewPauseSubscriber: (e) => ipcRenderer.send('open-view-pause-subscriber', e),
     openViewResumeSubscriber: (e) => ipcRenderer.send('open-view-resume-subscriber', e),
+    openViewCancelSubscriber: (e) => ipcRenderer.send('open-view-cancel-subscriber', e),
     openViewCancelPartner: (e) => ipcRenderer.send('open-view-cancel-partner', e),
     openViewEditPartner: (e) => ipcRenderer.send('open-view-edit-partner', e),
     openViewPaymentSheet: (e) => ipcRenderer.send('open-view-payment-sheet', e),

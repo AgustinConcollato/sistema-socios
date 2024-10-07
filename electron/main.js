@@ -122,6 +122,27 @@ function createWindow() {
             });
     });
 
+    ipcMain.on('open-view-cancel-subscriber', (_, e) => {
+        const resumeSubscriber = new BrowserWindow({
+            width: 600,
+            height: 350,
+            minWidth: 600,
+            minHeight: 350,
+            modal: true,
+            parent: subscriberDetail,
+            minimizable: false,
+            resizable: false,
+            webPreferences: {
+                preload: path.join(__dirname, 'preload.js')
+            },
+        });
+
+        resumeSubscriber.loadFile('./src/pages/cancelSubscriber.html')
+            .then(() => {
+                resumeSubscriber.webContents.send('send-subscriber-id', e);
+            });
+    });
+
     ipcMain.on('open-view-cancel-partner', (_, e) => {
         const resumeSubscriber = new BrowserWindow({
             width: 600,

@@ -64,6 +64,15 @@ ipcMain.handle('resume-subscriber', async (_, { id }) => {
     }
 })
 
+ipcMain.handle('cancel-subscriber', async (_, { id }) => {
+    try {
+        const response = await cancelSubscriber(id);
+        return response
+    } catch (error) {
+        console.error('Error obteniendo planes:', error);
+    }
+})
+
 async function getPlans() {
     try {
         const response = await preApproval.search({

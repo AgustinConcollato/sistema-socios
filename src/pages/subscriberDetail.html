@@ -42,7 +42,7 @@
             }
 
             const btnCancel = document.getElementById('btn-cancel')
-            // btnCancel.addEventListener('click', () => window.electronAPI.openViewEditAmount(sub))
+            btnCancel.addEventListener('click', () => window.electronAPI.openViewCancelSubscriber(sub))
         }
 
         const generateView = async (args) => {
