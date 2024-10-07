@@ -6,16 +6,42 @@ body {
 
 h3 {
     display: flex;
-    gap: 5px;
+    gap: 10px;
+    align-items: center;
+}
+
+h3 div {
+    display: flex;
+    align-items: stretch;
+}
+
+h3 div input {
+    border: 1px solid #eee;
+    padding: 5px 10px;
+    width: 65px;
+    text-align: center;
+    font-size: 14px;
+}
+
+h3 div button {
+    padding: 5px 10px;
+    background: #f0f0f0;
+    border: none;
+}
+
+h3 div button:first-child {
+    border-radius: 5px 0 0 5px;
+}
+
+h3 div button:last-child {
+    border-radius: 0 5px 5px 0;
 }
 
 #info-partner {
-    /* outline: auto; */
     width: 50%;
 }
 
 #info-payments {
-    /* outline: auto; */
     width: 50%;
 }
 
@@ -23,16 +49,20 @@ h3 {
     margin-top: 15px;
 }
 
-.calendar li {
+ul li {
     display: flex;
     justify-content: space-between;
     color: #aaa;
-    border-bottom: 1px solid #eee;
-    padding: 5px 10px;
+    padding: 5px 0;
 }
 
-.calendar li b,
-.calendar li span {
+.calendar li {
+    padding: 5px 10px;
+    border-bottom: 1px solid #eee;
+}
+
+ul li b,
+ul li span {
     color: #000;
 }
 
