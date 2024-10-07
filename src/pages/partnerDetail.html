@@ -84,9 +84,11 @@
 
                 // Agregar listeners para los botones de aumentar y disminuir el año
                 document.getElementById('increase-year').addEventListener('click', async () => {
-                    year++;
-                    document.getElementById('year-input').value = year; // Actualiza el input
-                    await fetchAndDisplayPayments(partnerId, year); // Recarga los pagos con el nuevo año
+                    if (year < currentdate.getFullYear()) {
+                        year++;
+                        document.getElementById('year-input').value = year; // Actualiza el input
+                        await fetchAndDisplayPayments(partnerId, year); // Recarga los pagos con el nuevo año
+                    }
                 });
 
                 document.getElementById('decrease-year').addEventListener('click', async () => {

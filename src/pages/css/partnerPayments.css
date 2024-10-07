@@ -32,6 +32,20 @@
     margin: 30px 0 10px;
 }
 
+#partner-payments a {
+    display: inline-block;
+    margin-top: 20px;
+}
+
+#partner-payments a i {
+    font-size: 14px;
+}
+
+#partner-payments a:hover,
+#partner-payments a:hover i {
+    color: #385F99;
+}
+
 .no-payments {
     display: block;
     padding: 20px 10px;

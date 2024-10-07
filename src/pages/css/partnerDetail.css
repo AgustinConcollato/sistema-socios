@@ -27,6 +27,7 @@ h3 div button {
     padding: 5px 10px;
     background: #f0f0f0;
     border: none;
+    cursor: pointer;
 }
 
 h3 div button:first-child {

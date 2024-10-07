@@ -1,7 +1,7 @@
 const path = require('node:path');
 const sqlite3 = require('sqlite3').verbose()
 
-const dbPath = path.resolve(__dirname, '../database/database-dev.db');
+const dbPath = path.resolve(__dirname, '../database/database.db');
 
 // Crear una nueva conexión a la base de datos
 const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {

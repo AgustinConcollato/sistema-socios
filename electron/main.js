@@ -215,6 +215,7 @@ app.on('ready', () => {
     require('./utils/addPayment')
     require('./utils/subscriptionMP')
     require('./utils/generatePDF')
+    require('./utils/backup')
 });
 
 app.on('window-all-closed', () => {

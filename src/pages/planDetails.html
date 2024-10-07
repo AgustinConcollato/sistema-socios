@@ -33,14 +33,13 @@
                 <li><a href='./paymentSheet.html'>Planillas</a></li>
             </ul>
         </nav>
-        <!-- <div class="searcher">
-            <label for="search">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </label>
-            <input type="text" id="search" placeholder="Buscar por nombre, apellido o número de socio" />
-            <div class="response"></div>
-        </div> -->
-        <button class='btn' id="new-partner">+ Nuevo socio</button>
+        <div>
+            <button class='btn' id="new-partner">+ Nuevo socio</button>
+            <button class="btn" id="btn-option-backup"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <ul id="menu-backup">
+                <li><button id="backup">Copia de seguridad</button></li>
+            </ul>
+        </div>
     </header>
     <section>
         <div class="header-plan">
@@ -259,7 +258,7 @@
 
     </script>
     <script src="../scripts/openViewNewPartner.js"></script>
-
+    <script src="../scripts/backup.js"></script>
 </body>
 
 </html>

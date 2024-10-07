@@ -32,14 +32,13 @@
         <li><a href='./paymentSheet.html'>Planillas</a></li>
       </ul>
     </nav>
-    <!-- <div class="searcher">
-        <label for="search">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </label>
-        <input type="text" id="search" placeholder="Buscar por nombre, apellido o número de socio" />
-        <div class="response"></div>
-      </div> -->
-    <button class='btn' id="new-partner">+ Nuevo socio</button>
+    <div>
+      <button class='btn' id="new-partner">+ Nuevo socio</button>
+      <button class="btn" id="btn-option-backup"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+      <ul id="menu-backup">
+        <li><button id="backup">Copia de seguridad</button></li>
+      </ul>
+    </div>
   </header>
   <section>
     <h1>Socios</h1>
@@ -326,12 +325,16 @@
           const div = document.createElement('div')
           const divOptions = document.createElement('div')
           const p = document.createElement('p')
+          const a = document.createElement('a')
           const btnNewPayment = document.createElement('button')
           const btnPaymentOption1 = document.createElement('button')
           const btnPaymentOption2 = document.createElement('button')
           const btnPaymentOption3 = document.createElement('button')
           const inputNewPayment = document.createElement('input')
           const xMark = document.createElement('button')
+
+          a.innerHTML = 'Ver detalle de todos los pagos <i class="fa-solid fa-angle-right"></i>'
+          a.href = '#'
 
           xMark.innerHTML = '<i class="fa-solid fa-xmark"></i>'
           xMark.classList.add('close-payments')
@@ -349,6 +352,10 @@
 
             const { partner, payments } = response
 
+            a.onclick = (event) => {
+              event.preventDefault()
+              window.electronAPI.openViewPartnerDetail(partner)
+            }
             parnterName.innerText = partner.name
             subtitle.innerText = `Pagos del año ${year}`
 
@@ -426,6 +433,8 @@
               noPayments.className = 'no-payments'
               noPayments.innerText = `No hay pagos registrados del ${year}`
               partnerPaymentsContainer.appendChild(noPayments)
+              partnerPaymentsContainer.appendChild(a)
+
               return
             } else {
 
@@ -453,8 +462,8 @@
 
 
               partnerPaymentsContainer.appendChild(calendar)
+              partnerPaymentsContainer.appendChild(a)
             }
-
           } catch (error) {
             console.log(error)
           }
@@ -644,6 +653,7 @@
 
   </script>
   <script src="../scripts/openViewNewPartner.js"></script>
+  <script src="../scripts/backup.js"></script>
 </body>
 
 </html>
