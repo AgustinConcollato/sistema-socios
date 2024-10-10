@@ -246,7 +246,7 @@ function generateAllPDF({ collect, all, year, price, collectorName, id }) {
                                                 <span>APORTANTE</span>
                                                 <h5>${e.name}</h5>
                                                 <p>${e.address}</p>
-                                                <p>${e.neighborhood}</p>
+                                                <p>${e.neighborhood || '---'}</p>
                                             </div>
                                             <div>
                                                 <span>Valor cuota</span>

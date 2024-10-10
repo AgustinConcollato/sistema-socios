@@ -18,6 +18,7 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script src="../scripts/addPayment.js"></script>
   <script src="../scripts/formatNumber.js"></script>
+  <script src="../scripts/formatDate.js"></script>
 </head>
 
 <body>
@@ -141,16 +142,34 @@
           const partnerTableBody = document.getElementById('partner-table-body');
           partnerTableBody.innerHTML = '';
 
+          console.log(partnerList)
+
           partnerList.forEach((e, i) => {
-            const last_payment = e.last_payment_date ? new Date(e.last_payment_date).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }) : 'No realizó pagos'
-
-            const paymentDate = new Date(e.last_payment_date);
-
-            const paymentYear = paymentDate.getFullYear();
-            const paymentMonth = paymentDate.getMonth();
             const currentYear = currentdate.getFullYear();
             const currentMonth = currentdate.getMonth();
 
+            // Ordenar pagos por fecha en orden descendente
+            const sortedPayments = e.payments ? e.payments.sort((a, b) => b.payment_date - a.payment_date) : []
+
+            let lastPaymentDate, lastPaymentAmount, paymentForCurrentMonth = null;
+
+            // Recorrer los pagos para verificar si cubren el mes actual o meses posteriores
+            sortedPayments.forEach(payment => {
+              const paymentDate = new Date(payment.payment_date);
+              const paymentYear = paymentDate.getFullYear();
+              const paymentMonth = paymentDate.getMonth();
+
+              paymentForCurrentMonth = e.payments.find(payment => {
+                const paymentDate = new Date(payment.payment_date);
+                return paymentDate.getFullYear() === currentYear && paymentDate.getMonth() === currentMonth;
+              });
+
+              // Almacenar el último pago realizado
+              if (!lastPaymentDate || paymentDate > lastPaymentDate) {
+                lastPaymentDate = paymentDate;
+                lastPaymentAmount = payment.amount;
+              }
+            });
             const tr = document.createElement('tr');
 
             // Crear y configurar la primera columna
@@ -171,27 +190,27 @@
             const tdPayment = document.createElement('td');
             tdPayment.setAttribute('data-id', e.id);
 
-            if (e.last_payment_amount) {
+            if (lastPaymentAmount) {
               const h4Amount = document.createElement('h4');
-              h4Amount.innerText = '$' + formatNumber(e.last_payment_amount);
+              h4Amount.innerText = '$' + formatNumber(lastPaymentAmount);
               tdPayment.appendChild(h4Amount);
             }
 
             const pLastPayment = document.createElement('p');
-            pLastPayment.innerText = last_payment;
+            pLastPayment.innerText = lastPaymentDate ? formatDate(lastPaymentDate) : 'No realizó pagos';
             tdPayment.appendChild(pLastPayment);
 
             // Crear y configurar la tercera columna (estado del pago)
             const tdPaymentStatus = document.createElement('td');
             tdPaymentStatus.setAttribute('data-id', e.id);
 
-            if ((paymentYear === currentYear) && (paymentMonth === currentMonth)) {
+            if (paymentForCurrentMonth) {
               tdPaymentStatus.innerHTML = `
-                  <h4>$${formatNumber(e.last_payment_amount)}</h4>
-                  <p>${last_payment}</p>
+                  <h4>$${formatNumber(paymentForCurrentMonth.amount)}</h4>
+                  <p>${formatDate(paymentForCurrentMonth.payment_date)}</p>
                 `
             } else {
-              tdPaymentStatus.innerHTML = `<span>No realizado</span>`
+              tdPaymentStatus.innerHTML = `<span>No realizado</span>`;
             }
 
             // Crear y configurar la cuarta columna (botón de opciones)
@@ -288,24 +307,7 @@
               loadPartnerPayments(memberId)
             });
           });
-
-          const closeAllMenus = () => {
-            document.querySelectorAll('.partner-options').forEach(option => {
-              option.style.display = 'none';
-            });
-            document.querySelectorAll('.btn i').forEach(icon => {
-              icon.classList.remove('fa-xmark');
-              icon.classList.add('fa-ellipsis-vertical');
-            });
-          };
-
-          document.addEventListener('click', (event) => {
-            if (!event.target.closest('.btn') && !event.target.closest('.partner-options')) {
-              closeAllMenus();
-            }
-          });
         }
-
       };
 
 
@@ -654,6 +656,7 @@
   </script>
   <script src="../scripts/openViewNewPartner.js"></script>
   <script src="../scripts/backup.js"></script>
+  <script src="../scripts/closeMenu.js"></script>
 </body>
 
 </html>
