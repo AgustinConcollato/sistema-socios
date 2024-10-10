@@ -16,7 +16,6 @@
     crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-  <script src="../scripts/addPayment.js"></script>
   <script src="../scripts/formatNumber.js"></script>
   <script src="../scripts/formatDate.js"></script>
 </head>
@@ -79,6 +78,7 @@
     document.addEventListener("DOMContentLoaded", () => {
 
       const currentdate = new Date()
+      let paymentDates = currentdate
 
       let partnerList = [];
       let collect = 1;
@@ -141,8 +141,6 @@
           `
           const partnerTableBody = document.getElementById('partner-table-body');
           partnerTableBody.innerHTML = '';
-
-          console.log(partnerList)
 
           partnerList.forEach((e, i) => {
             const currentYear = currentdate.getFullYear();
@@ -358,6 +356,7 @@
               event.preventDefault()
               window.electronAPI.openViewPartnerDetail(partner)
             }
+
             parnterName.innerText = partner.name
             subtitle.innerText = `Pagos del año ${year}`
 
@@ -376,7 +375,13 @@
               'diciembre',
             ]
 
-            p.innerHTML = `Pago de <b>${month[currentdate.getMonth()]}</b>`
+            p.innerHTML = `
+            Pago de 
+            <select id="months-payment">
+              <option value="${paymentDates.getMonth()}" >${month[paymentDates.getMonth()]}</option>
+              ${month.map((e, i) => `<option value="${i}">${e}</option>`).join('')}
+            </select>
+            `
 
             inputNewPayment.type = 'number'
             inputNewPayment.placeholder = 'Monto'
@@ -401,7 +406,6 @@
             divOptions.appendChild(btnPaymentOption1)
             divOptions.appendChild(btnPaymentOption2)
             divOptions.appendChild(btnPaymentOption3)
-            form.appendChild(p)
             form.appendChild(div)
             form.appendChild(divOptions)
 
@@ -419,6 +423,7 @@
 
             form.onsubmit = (e) => {
               e.preventDefault()
+
               if (e.target[0].value > 0) {
                 addPayment({ id, e })
                 currentId = ''
@@ -427,8 +432,24 @@
               }
             }
 
+            partnerPaymentsContainer.appendChild(p)
+
+            const monthsSelect = document.getElementById('months-payment')
+
+            const p1 = document.createElement('p')
+            const calendar = document.createElement('div')
+
+            calendar.className = 'calendar'
+            p1.className = 'payment-notification'
+
+            partnerPaymentsContainer.appendChild(p1)
             partnerPaymentsContainer.appendChild(form)
             partnerPaymentsContainer.appendChild(subtitle)
+
+            monthsSelect.onchange = () => {
+              const selectedMonth = monthsSelect.value;
+              thisPayment(payments, selectedMonth, form, p1, calendar)
+            };
 
             if (payments.length == 0) {
               const noPayments = document.createElement('p')
@@ -437,31 +458,13 @@
               partnerPaymentsContainer.appendChild(noPayments)
               partnerPaymentsContainer.appendChild(a)
 
+              p1.style.display = 'none'
+              form.style.display = 'block'
+
               return
             } else {
 
-              let monthsPaid = []
-              const calendar = document.createElement('div')
-              calendar.className = 'calendar'
-
-              payments.forEach(e => {
-
-                const paymentDate = new Date(e.payment_date)
-                monthsPaid[paymentDate.getMonth()] = paymentDate.getMonth()
-
-                if (paymentDate.getMonth() == currentdate.getMonth()) {
-                  form.style.display = 'none'
-                  const p = document.createElement('p')
-                  p.className = 'payment-notification'
-                  p.innerHTML = `Mes de ${month[currentdate.getMonth()]} <b>PAGADO</b>`
-                  partnerPaymentsContainer.appendChild(p)
-                  partnerPaymentsContainer.appendChild(subtitle)
-                }
-
-              })
-
-              generateCalendar(calendar, monthsPaid)
-
+              thisPayment(payments, monthsSelect.value, form, p1, calendar)
 
               partnerPaymentsContainer.appendChild(calendar)
               partnerPaymentsContainer.appendChild(a)
@@ -490,7 +493,32 @@
         getPartners({ collect, status, offset: 0 });
       });
 
+      function thisPayment(payments, selectedMonth, form, p1, calendar) {
+        let monthsPaid = []
+
+        payments.forEach(e => {
+          const paymentDate = new Date(e.payment_date)
+          monthsPaid[paymentDate.getMonth()] = paymentDate.getMonth()
+        })
+
+        if (monthsPaid.includes(parseInt(selectedMonth))) {
+          form.style.display = 'none'
+          p1.style.display = 'block'
+          p1.innerHTML = `Mes de ${month[selectedMonth]} <b>PAGADO</b>`
+
+        } else {
+          p1.style.display = 'none'
+          form.style.display = 'block'
+        }
+
+        calendar.innerHTML = ''
+        generateCalendar(calendar, monthsPaid)
+
+      }
+
       const generateCalendar = (calendar, monthsPaid) => {
+
+        console.log(monthsPaid)
 
         let i = 0
 
@@ -657,6 +685,7 @@
   <script src="../scripts/openViewNewPartner.js"></script>
   <script src="../scripts/backup.js"></script>
   <script src="../scripts/closeMenu.js"></script>
+  <script src="../scripts/addPayment.js"></script>
 </body>
 
 </html>
