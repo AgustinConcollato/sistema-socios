@@ -1,4 +1,4 @@
-const { dialog, ipcMain } = require('electron');
+const { dialog, ipcMain, app } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
@@ -7,7 +7,7 @@ ipcMain.on('backup', () => {
 })
 
 function chooseBackupLocation() {
-    const dbPath = path.join(__dirname, '../database/database.db');
+    const dbPath = path.join(app.getPath('userData'), 'database.db');
 
     const date = new Date()
 

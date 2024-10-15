@@ -8,14 +8,23 @@ const { shell } = require('electron');
 
 ipcMain.handle('payment-sheet', async (_, args) => {
     try {
-        const response = await generateAllPDF(args)
+        const response = await generatePDF(args)
         return response
     } catch (error) {
         console.log(error)
     }
 })
 
-function generateAllPDF({ collect, all, year, price, collectorName, id }) {
+ipcMain.handle('payment-sheet-collect', async (_, args) => {
+    try {
+        const response = await generatePDFCollect(args)
+        return response
+    } catch (error) {
+        console.log(error)
+    }
+})
+
+function generatePDF({ collect, all, year, price, collectorName, id }) {
 
     return new Promise((resolve, reject) => {
 
@@ -284,6 +293,159 @@ function generateAllPDF({ collect, all, year, price, collectorName, id }) {
 
                     const tempDir = os.tmpdir();
                     const pdfFilename = `${id ? 'Planilla de ' + results[0].name : 'Planillas del ' + year}-${Date.now()}.pdf`;
+                    const pdfPath = path.join(tempDir, pdfFilename);
+
+                    console.log(pdfPath)
+                    // Escribir el buffer del PDF en el archivo
+                    fs.writeFile(pdfPath, pdfBuffer, (err) => {
+                        if (err) {
+                            reject(err.message);
+                        } else {
+                            resolve({ pdf: pdfPath, status: 'success' });
+                        }
+                    });
+
+                    deletePDF(pdfPath)
+
+                } catch (err) {
+                    reject(err.message);
+                }
+
+
+            }
+        })
+    })
+}
+
+function generatePDFCollect() {
+
+    return new Promise((resolve, reject) => {
+
+        const sql = `SELECT * FROM partner WHERE collect = ? AND status = ?`
+
+
+        db.all(sql, [2, 'active'], async (error, results) => {
+            if (error) {
+                reject(error.message)
+            } else {
+                const htmlContent = `             
+                    <html>
+                            <head>
+                                <style>
+                                    * {
+                                        margin: 0;
+                                        padding: 0;
+                                        box-sizing: border-box;
+                                        color: #000;
+                                    }
+
+                                    ul {
+                                        list-style: none;
+                                    }
+
+                                    body {
+                                        font-family: Arial, sans-serif;
+                                        width: 21cm;
+                                        height: 29.7cm;
+                                        min-width: 21cm;
+                                        min-height: 29.7cm;
+                                    }
+                                    
+                                    span {
+                                        width: 20px;
+                                    }
+
+                                    thead tr td {
+                                        padding: 10px;
+                                        border-bottom: 1px solid #000;
+                                        }
+                                        
+                                    tbody tr td {
+                                        padding: 7px 10px;
+                                        border-bottom: 1px solid #eee;
+                                    }
+
+                                    .cuadrado {
+                                        height: 20px;
+                                        width: 20px;
+                                        border: 1px solid #000;
+                                    }
+                                </style>
+                                <title>Planilla para cobrador</title>
+                            </head>
+
+                            <body>
+                            <table cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <td style="width: 80px;">N°</td>
+                                        <td>NOMBRE Y APPELIDO</td>
+                                        <td style="display: flex; gap: 10px">
+                                            <span>E</span>
+                                            <span>F</span>
+                                            <span>M</span>
+                                            <span>A</span>
+                                            <span>M</span>
+                                            <span>J</span>
+                                            <span>J</span>
+                                            <span>A</span>
+                                            <span>S</span>
+                                            <span>O</span>
+                                            <span>N</span>
+                                            <span>D</span>
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${results.map(e => (`
+                                    <tr>
+                                        <td>${e.member_number}</td>
+                                        <td>${e.name}</td>
+                                        <td style="display: flex; gap: 10px">
+                                            <div class="cuadrado"></div>
+                                            <div class="cuadrado"></div>
+                                            <div class="cuadrado"></div>
+                                            <div class="cuadrado"></div>
+                                            <div class="cuadrado"></div>
+                                            <div class="cuadrado"></div>
+                                            <div class="cuadrado"></div>
+                                            <div class="cuadrado"></div>
+                                            <div class="cuadrado"></div>
+                                            <div class="cuadrado"></div>
+                                            <div class="cuadrado"></div>
+                                            <div class="cuadrado"></div>
+                                        </td>
+                                    </tr>
+                                `
+                )).join('')}
+                                </tbody>
+                            </table>
+                            </body>
+                    </html>
+                `
+
+                try {
+                    const browser = await puppeteer.launch({
+                        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+                    });
+                    const page = await browser.newPage();
+                    await page.setContent(htmlContent, { waitUntil: 'load' });
+
+                    const pdfBuffer = await page.pdf({
+                        format: 'A4',
+                        printBackground: true,
+                        margin: {
+                            top: '0.5cm',
+                            bottom: '0.5cm',
+                            left: '0.5cm',
+                            right: '0.5cm'
+                        }
+                    });
+
+                    await browser.close();
+
+                    const tempDir = os.tmpdir();
+                    const pdfFilename = `Planilla para cobrador-${Date.now()}.pdf`;
                     const pdfPath = path.join(tempDir, pdfFilename);
 
                     console.log(pdfPath)

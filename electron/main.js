@@ -3,7 +3,7 @@ const path = require('path');
 const { ipcMain } = require('electron/main');
 
 function createWindow() {
-    // Menu.setApplicationMenu(null);
+    Menu.setApplicationMenu(null);
 
     const win = new BrowserWindow({
         width: 1366,
@@ -11,12 +11,13 @@ function createWindow() {
         minWidth: 1366,
         minHeight: 768,
         fullscreenable: true,
+        icon: path.join(__dirname, './app.ico'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
         }
     });
 
-    // win.maximize();
+    win.maximize();
 
     win.loadFile('src/pages/index.html')
 
@@ -29,6 +30,7 @@ function createWindow() {
             parent: win,
             modal: true,
             resizable: false,
+            icon: path.join(__dirname, './app.ico'),
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },
@@ -46,6 +48,7 @@ function createWindow() {
             minHeight: 700,
             modal: true,
             fullscreenable: true,
+            icon: path.join(__dirname, './app.ico'),
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },
@@ -68,6 +71,7 @@ function createWindow() {
             parent: subscriberDetail,
             minimizable: false,
             resizable: false,
+            icon: path.join(__dirname, './app.ico'),
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },
@@ -90,6 +94,7 @@ function createWindow() {
             parent: subscriberDetail,
             minimizable: false,
             resizable: false,
+            icon: path.join(__dirname, './app.ico'),
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },
@@ -111,6 +116,7 @@ function createWindow() {
             parent: subscriberDetail,
             minimizable: false,
             resizable: false,
+            icon: path.join(__dirname, './app.ico'),
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },
@@ -132,6 +138,7 @@ function createWindow() {
             parent: subscriberDetail,
             minimizable: false,
             resizable: false,
+            icon: path.join(__dirname, './app.ico'),
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },
@@ -152,6 +159,7 @@ function createWindow() {
             modal: true,
             minimizable: false,
             resizable: false,
+            icon: path.join(__dirname, './app.ico'),
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },
@@ -168,6 +176,7 @@ function createWindow() {
             width: 550,
             height: 700,
             modal: true,
+            icon: path.join(__dirname, './app.ico'),
             resizable: false,
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
@@ -188,6 +197,7 @@ function createWindow() {
             minHeight: 700,
             modal: true,
             fullscreenable: true,
+            icon: path.join(__dirname, './app.ico'),
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },
@@ -207,6 +217,7 @@ function createWindow() {
             minHeight: 700,
             modal: true,
             resizable: false,
+            icon: path.join(__dirname, './app.ico'),
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js')
             },

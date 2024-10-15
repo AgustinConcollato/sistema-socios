@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Planillas</title>
     <link rel="stylesheet" href="./css/nav.css">
     <link rel="stylesheet" href="./css/header.css">
     <link rel="stylesheet" href="./css/paymentSheet.css">
@@ -46,7 +46,7 @@
                         <li><button id="btn-all">Todas</button></li>
                     </ul>
                 </li>
-                <li><button class="btn">Generar planilla para cobrador</button></li>
+                <li><button class="btn" id="collect-generate-pdf">Generar planilla para cobrador</button></li>
             </ul>
             <div class="more-options">
                 <span>Más opciones</span>
@@ -77,6 +77,7 @@
             const btnCollect = document.getElementById('btn-collect')
             const btnAll = document.getElementById('btn-all')
             const containerPreviews = document.getElementById('container-previews')
+            const btnCollectGeneratePDF = document.getElementById('collect-generate-pdf')
 
             let menu = false
             const iframe = document.createElement('iframe')
@@ -107,6 +108,19 @@
                 generatePDF({ collect: 0, all: true })
             })
 
+            btnCollectGeneratePDF.addEventListener('click', async () => {
+
+                containerPreviews.innerHTML = ''
+                try {
+                    const response = await window.electronAPI.collectGeneratePDF()
+
+                    iframe.src = response.pdf
+
+                    containerPreviews.appendChild(iframe)
+                } catch (error) {
+                    console.log(error)
+                }
+            })
 
             async function generatePDF({ collect, all }) {
 

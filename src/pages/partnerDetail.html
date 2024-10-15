@@ -27,6 +27,8 @@
 
             const { id, name, address, collect, neighborhood, contact, member_number, date, status } = args
 
+            document.title = `Detalle de ${name}`
+
             displayPartnerInfo(infoPartner, args);
             await fetchAndDisplayPayments(id, year);
 

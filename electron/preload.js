@@ -63,6 +63,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     /////////////////// generar pdf --- planillas
 
     generatePDF: (e) => ipcRenderer.invoke('payment-sheet', e),
+    collectGeneratePDF: (e) => ipcRenderer.invoke('payment-sheet-collect', e),
 
     ////////////////// backup
 

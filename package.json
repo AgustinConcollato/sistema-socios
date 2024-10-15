@@ -2,6 +2,8 @@
   "name": "sistema-socios-catedral",
   "version": "0.1.0",
   "private": true,
+  "author": "Conco Soluciones Web",
+  "description": "Sistema de socios, gestión y registro de los pagos",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1",
     "mercadopago": "^2.0.15",
@@ -28,15 +30,21 @@
     "@electron/fuses": "^1.8.0",
     "electron": "^32.0.2"
   },
+  "build": {
+    "appId": "concosw.netlify.app",
+    "icon": "electron/app"
+  },
   "config": {
     "forge": {
+      "packagerConfig": {
+        "icon": "electron/app"
+      },
       "makers": [
         {
-          "name": "@electron-forge/maker-zip",
+          "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "sistema socios",
-            "authors": "ConcoSolucionesWeb",
-            "description": "administrar los pagos de los socios"
+            "iconUrl": "https://ruta/de/tu/app-icon.ico",
+            "setupIcon": "electron/app.ico"
           }
         }
       ]

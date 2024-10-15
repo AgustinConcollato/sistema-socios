@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title></title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="./css/editPartner.css">
 </head>
@@ -15,6 +15,7 @@
 
             const { id, name, address, collect, neighborhood, contact, member_number } = partner
 
+            document.title = `Editar datos de ${name}`
             const body = document.body
             const form = document.createElement('form')
 

@@ -13,8 +13,10 @@ ipcMain.handle('get-partner', async (_, args) => {
                         , ','), '') || ']' AS payments
                 FROM partner
                 LEFT JOIN (
-                    SELECT partner_id, amount, payment_date
+                    SELECT *
                     FROM payments
+                    ORDER BY payment_date DESC
+                    LIMIT 12
                 ) AS payments ON partner.id = payments.partner_id
                 WHERE partner.collect = ? 
                 AND partner.status = ?
