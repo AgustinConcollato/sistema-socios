@@ -1,7 +1,7 @@
 const { ipcMain } = require('electron/main');
 const mercadopago = require('mercadopago');
 
-const TOKEN = '...'
+const TOKEN = '...';
 
 const config = new mercadopago.MercadoPagoConfig({
     accessToken: TOKEN
@@ -80,8 +80,7 @@ async function getPlans() {
                 limit: 90,
                 offset: 0,
                 status: 'active',
-                q: 'plan_prueba', // cambiar a la referencia seleccionada
-                // q: 'tobiassanrafael', // cambiar a la referencia seleccionada
+                q: 'tobiassanrafael',
             }
         });
 

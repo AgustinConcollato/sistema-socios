@@ -125,7 +125,7 @@
 
                             tdName.innerText = `${e.payer_first_name} ${e.payer_last_name}`
                             tdNextPaymentDate.innerText = formatDate(e.next_payment_date)
-                            tdAmount.innerText = '$' + e.auto_recurring.transaction_amount
+                            tdAmount.innerText = '$' + parseFloat(e.auto_recurring.transaction_amount).toLocaleString('es-AR')
                             btnDetails.innerText = 'Ver detalles'
                             btnDetails.className = 'btn'
 

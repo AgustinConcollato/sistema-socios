@@ -124,11 +124,23 @@
 
             async function generatePDF({ collect, all }) {
 
-                const price = document.getElementById('min-amount').value || collect == 1 ? 3000 : 2000
+                let price = 2000;
+
+                if (collect == 1) {
+                    price = 3000;
+                }
+
+                if (document.getElementById('min-amount').value) {
+                    price = document.getElementById('min-amount').value;
+                }
+
                 const year = document.getElementById('year').value || (new Date().getFullYear() + 1)
                 const collectorName = document.getElementById('collector-name').value || 'Caglieris, Carla'
 
                 containerPreviews.innerHTML = ''
+
+                console.log(price)
+
                 try {
                     const response = await window.electronAPI.generatePDF({ collect, all, year, price, collectorName })
 

@@ -26,6 +26,8 @@ ipcMain.handle('payment-sheet-collect', async (_, args) => {
 
 function generatePDF({ collect, all, year, price, collectorName, id }) {
 
+    console.log(price)
+
     return new Promise((resolve, reject) => {
 
         let sql = ''
@@ -201,7 +203,20 @@ function generatePDF({ collect, all, year, price, collectorName, id }) {
                                         <p>APORTANTE: <b>${e.member_number} - ${e.name}</b></p>
                                         <div>
                                             <div style="width: 7.5cm;">
-                                                <p style="font-size: 14px">${e.address}</p>
+                                                <p 
+                                                style="
+                                                    font-size: 14px;
+                                                    display: -webkit-box;
+                                                    -webkit-line-clamp: 1;
+                                                    -webkit-box-orient: vertical;
+                                                    max-width: calc(100% - 25px);
+                                                    pointer-events: none;
+                                                    overflow-wrap: break-word;
+                                                    overflow: hidden;
+                                                "
+                                                >
+                                                ${e.address}
+                                                </p>
                                                 <p style="font-size: 14px">${e.neighborhood || '---'}</p>
                                                 <div style="margin-top: 15px; display: inline-flex; gap: 5px; align-items: center; font-size: 14px;">Valor cuota <div class="cuadrado">$${price}</div></div>
                                             </div>

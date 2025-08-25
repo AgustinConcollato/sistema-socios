@@ -67,13 +67,13 @@
                 const subscriptionData = document.getElementById('container-subscription-data');
                 subscriptionData.innerHTML = `
                     <h2>${payer_first_name} ${payer_last_name}</h2>
-                    <p style="font-size: 20px; font-weight: 600;">Paga ${sub.auto_recurring.transaction_amount ? '$' + sub.auto_recurring.transaction_amount : '-'}</p>
+                    <p style="font-size: 20px; font-weight: 600;">Paga ${parseFloat(sub.auto_recurring.transaction_amount).toLocaleString('es-AR', { maximumFractionDigits: 2 }) ? '$' + parseFloat(sub.auto_recurring.transaction_amount).toLocaleString('es-AR', { maximumFractionDigits: 2 }) : '-'}</p>
                     <ul class="subscription-data">
                         <li>Fecha de adhesión <span>${formatDate(sub.date_created)}</span></li>
                         <li>Pagos recibidos <span>${summarized.charged_quantity}</span></li>
                         <li>Fecha de facturación  <span>Día ${formatDate(summarized.last_charged_date).split(' ')[0]}</span></li>
                         <li>Fecha del último pago <span>${formatDate(summarized.last_charged_date)}</span></li>
-                        <li>Último pago <span>$${summarized.last_charged_amount}</span></li>
+                        <li>Último pago <span>$${parseFloat(summarized.last_charged_amount).toLocaleString('es-AR', { maximumFractionDigits: 2 })}</span></li>
                         <li>Fecha del próximo pago <span>${formatDate(sub.next_payment_date)}</span></li>
                         ${summarized.pending_charge_quantity ? '<li>Cantidad de pagos pendientes <span>' + summarized.pending_charge_quantity + '</span></li>' : ''}
                         ${summarized.pending_charge_quantity ? '<li>Cantidad de pagos pendientes <span>$' + summarized.pending_charge_amount + '</span></li>' : ''}
