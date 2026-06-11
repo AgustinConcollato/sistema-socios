@@ -16,6 +16,7 @@
     crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="../scripts/toast.js"></script>
   <script src="../scripts/formatNumber.js"></script>
   <script src="../scripts/formatDate.js"></script>
 </head>
@@ -102,6 +103,12 @@
 
         try {
           const results = await window.electronAPI.getPartners({ collect, status, offset });
+
+          if (results?.status === 'error') {
+            showToast(results.message, 'error');
+            return;
+          }
+
           partnerList = results;
 
           if (results.length != 0) {
@@ -114,7 +121,7 @@
           currentId = ''
           renderPartnerList();
         } catch (error) {
-          console.log(error);
+          showToast(error.message, 'error');
         }
       };
 
@@ -350,6 +357,11 @@
           try {
             const response = await window.electronAPI.getPartnerPayments({ id, year })
 
+            if (response?.status === 'error') {
+              showToast(response.message, 'error');
+              return;
+            }
+
             const { partner, payments } = response
 
             a.onclick = (event) => {
@@ -421,11 +433,17 @@
               inputNewPayment.value = 10000
             }
 
-            form.onsubmit = (e) => {
+            form.onsubmit = async (e) => {
               e.preventDefault()
 
               if (e.target[0].value > 0) {
-                addPayment({ id, e })
+                const response = await addPayment({ id, e })
+
+                if (response?.status === 'error') {
+                  showToast(response.message, 'error');
+                  return;
+                }
+
                 currentId = ''
                 getPartners({ collect: collectSelect.value, status: statusSelect.value, offset: currentOffset })
                 loadPartnerPayments(id)
@@ -470,7 +488,7 @@
               partnerPaymentsContainer.appendChild(a)
             }
           } catch (error) {
-            console.log(error)
+            showToast(error.message, 'error');
           }
         }
       }
@@ -637,15 +655,27 @@
 
       function optionsPartner({ partner, btnPause, btnResume, btnCancel, btnGeneratePDF, btnEdit }) {
 
-        btnPause.onclick = () => {
-          window.electronAPI.pausePartner(partner.id)
-          notification(`${partner.name} fue pausado`)
+        btnPause.onclick = async () => {
+          const response = await window.electronAPI.pausePartner(partner.id)
+
+          if (response?.status === 'error') {
+            showToast(response.message, 'error');
+            return;
+          }
+
+          showToast(`${partner.name} fue pausado`)
           getPartners({ collect: collectSelect.value, status: statusSelect.value, offset: currentOffset });
         }
 
-        btnResume.onclick = () => {
-          window.electronAPI.resumePartner(partner.id)
-          notification(`${partner.name} se reactivó`)
+        btnResume.onclick = async () => {
+          const response = await window.electronAPI.resumePartner(partner.id)
+
+          if (response?.status === 'error') {
+            showToast(response.message, 'error');
+            return;
+          }
+
+          showToast(`${partner.name} se reactivó`)
           getPartners({ collect: collectSelect.value, status: statusSelect.value, offset: currentOffset });
         }
 
@@ -656,25 +686,6 @@
         btnGeneratePDF.onclick = () => window.electronAPI.openViewPaymentSheet(partner)
 
         btnEdit.onclick = () => window.electronAPI.openViewEditPartner(partner)
-      }
-
-      function notification(text) {
-        Toastify({
-          text,
-          duration: 2000,
-          close: true,
-          newWindow: true,
-          gravity: "bottom",
-          position: "left",
-          stopOnFocus: true, // Prevents dismissing of toast on hover
-          style: {
-            background: "#000000cc",
-            color: "#fff",
-            border: "none ",
-            borderRadius: "5px",
-            boxShadow: "none"
-          },
-        }).showToast();
       }
 
       getPartners({ collect, status, offset: 0 });

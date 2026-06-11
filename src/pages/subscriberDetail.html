@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="../scripts/toast.js"></script>
     <script src="../scripts/formatDate.js"></script>
 </head>
 
@@ -61,6 +64,12 @@
 
             try {
                 const sub = await window.electronAPI.getSubscriberDetail(id);
+
+                if (sub?.status === 'error') {
+                    showToast(sub.message, 'error');
+                    return;
+                }
+
                 const { summarized } = sub;
 
                 // Ahora que tienes los datos, puedes reemplazar el contenido
@@ -82,7 +91,7 @@
 
                 subscriberOptions(args)
             } catch (error) {
-                console.log(error)
+                showToast(error.message, 'error')
             }
         }
 

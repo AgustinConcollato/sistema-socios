@@ -4,7 +4,8 @@ const db = require('../utils/database')
 ipcMain.handle('get-partner', async (_, args) => {
     const { collect, status, offset } = args
 
-    return new Promise((resolve, reject) => {
+    try {
+        return await new Promise((resolve, reject) => {
         const sql = `
         WITH partner_data AS (
                 SELECT partner.*, 
@@ -43,5 +44,9 @@ ipcMain.handle('get-partner', async (_, args) => {
                 resolve(transformedResults);
             }
         });
-    })
+        })
+    } catch (error) {
+        console.error(error)
+        return { status: 'error', message: typeof error === 'string' ? error : error.message }
+    }
 })

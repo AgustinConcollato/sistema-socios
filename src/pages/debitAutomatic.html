@@ -17,6 +17,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="../scripts/toast.js"></script>
 </head>
 
 <body>
@@ -56,25 +57,10 @@
             const copyLink = (planName, link) => {
                 navigator.clipboard.writeText(link)
                     .then(() => {
-                        Toastify({
-                            text: 'Link de ' + planName + ' copiado',
-                            duration: 2000,
-                            close: true,
-                            newWindow: true,
-                            gravity: "bottom",
-                            position: "left",
-                            stopOnFocus: true, // Prevents dismissing of toast on hover
-                            style: {
-                                background: "#000000cc",
-                                color: "#fff",
-                                border: "none ",
-                                borderRadius: "5px",
-                                boxShadow: "none"
-                            },
-                        }).showToast();
+                        showToast('Link de ' + planName + ' copiado')
                     })
                     .catch((error) => {
-                        console.error('Error al copiar el código: ', error)
+                        showToast(error.message, 'error')
                     })
 
 
@@ -83,6 +69,12 @@
             const getPlans = async () => {
                 try {
                     const plans = await window.electronAPI.getPlans()
+
+                    if (plans?.status === 'error') {
+                        showToast(plans.message, 'error');
+                        return;
+                    }
+
                     containerPlans.innerHTML = ''
                     plans.forEach(data => {
 
@@ -175,7 +167,7 @@
                         containerPlans.appendChild(divPlan)
                     });
                 } catch (error) {
-                    console.log(error)
+                    showToast(error.message, 'error')
                 }
             }
 

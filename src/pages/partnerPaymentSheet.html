@@ -7,6 +7,9 @@
     <title></title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="./css/paymentSheet.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="../scripts/toast.js"></script>
 </head>
 
 <body style="padding: 10px; display: flex; gap: 20px;">
@@ -41,19 +44,29 @@
             async function generatePDF({ collect, all, id }) {
 
                 const price = document.getElementById('min-amount').value || 2000
-                const year = document.getElementById('year').value || (new Date().getFullYear() + 1)
+                const year = document.getElementById('year').value || new Date().getFullYear()
                 const collectorName = document.getElementById('collector-name').value || 'Caglieris, Carla'
 
-                containerPreviews.innerHTML = ''
+                btnRegenerate.setAttribute('disabled', '')
+                containerPreviews.innerHTML = '<div class="loading"></div>'
 
                 try {
                     const response = await window.electronAPI.generatePDF({ collect, all, year, price, collectorName, id })
 
-                    iframe.src = response.pdf
+                    if (response?.status === 'error') {
+                        showToast(response.message, 'error');
+                        containerPreviews.innerHTML = ''
+                        return;
+                    }
 
+                    containerPreviews.innerHTML = ''
+                    iframe.src = response.pdf
                     containerPreviews.appendChild(iframe)
                 } catch (error) {
-                    console.log(error)
+                    showToast(error.message, 'error')
+                    containerPreviews.innerHTML = ''
+                } finally {
+                    btnRegenerate.removeAttribute('disabled')
                 }
             }
 

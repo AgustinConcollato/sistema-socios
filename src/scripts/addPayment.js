@@ -1,4 +1,4 @@
-const addPayment = ({ id, e }) => {
+const addPayment = async ({ id, e }) => {
     const selectedMonth = document.getElementById('months-payment').value
     const formData = new FormData(e.target)
     const selectedDate = new Date()
@@ -20,5 +20,5 @@ const addPayment = ({ id, e }) => {
         formObject[key] = value;
     });
 
-    window.electronAPI.addPartnerPayment(formObject)
+    return await window.electronAPI.addPartnerPayment(formObject)
 }

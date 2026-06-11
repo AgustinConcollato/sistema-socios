@@ -12,6 +12,9 @@
 /build
 /out
 
+# local config (contiene secretos)
+electron/config.js
+
 # misc
 .DS_Store
 .env.local

@@ -5,7 +5,8 @@ ipcMain.handle('get-partner-payments', async (_, args) => {
 
     const { id, year } = args
 
-    return new Promise((resolve, reject) => {
+    try {
+        return await new Promise((resolve, reject) => {
         sql = `
     SELECT p.*, pay.*
     FROM partner p
@@ -43,5 +44,9 @@ ipcMain.handle('get-partner-payments', async (_, args) => {
                 }
             }
         })
-    })
+        })
+    } catch (error) {
+        console.error(error)
+        return { status: 'error', message: typeof error === 'string' ? error : error.message }
+    }
 })

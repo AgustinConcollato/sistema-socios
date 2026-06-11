@@ -7,6 +7,9 @@
     <title>Modificar monto</title>
     <link rel="stylesheet" href="./style.css">
     <link rel="stylesheet" href="./css/subscriberDetail.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="../scripts/toast.js"></script>
 </head>
 
 <body style="padding: 20px;">
@@ -49,12 +52,18 @@
 
                 try {
                     const response = await window.electronAPI.updateSubscriberAmount({ id: sub.id, newAmount });
+
+                    if (response?.status === 'error') {
+                        showToast(response.message, 'error');
+                        return;
+                    }
+
                     if (response.auto_recurring.transaction_amount == newAmount) {
                         window.electronAPI.notifySubscriberDetailUpdate(response);
                         window.close()
                     }
                 } catch (error) {
-                    console.log(error)
+                    showToast(error.message, 'error');
                 }
                 finally {
                     loading.style.visibility = 'hidden';

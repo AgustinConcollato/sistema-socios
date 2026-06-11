@@ -12,6 +12,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="../scripts/toast.js"></script>
 </head>
 
 <body>
@@ -83,6 +86,16 @@
             const iframe = document.createElement('iframe')
             iframe.frameBorder = '0'
 
+            const generateButtons = [btnSecretariat, btnCollect, btnAll, btnCollectGeneratePDF]
+
+            function setLoading(isLoading) {
+                generateButtons.forEach(btn => btn.disabled = isLoading)
+
+                if (isLoading) {
+                    containerPreviews.innerHTML = '<div class="loading"></div>'
+                }
+            }
+
             btnMenuGenerate.addEventListener('click', () => {
                 menu = !menu
 
@@ -110,15 +123,24 @@
 
             btnCollectGeneratePDF.addEventListener('click', async () => {
 
-                containerPreviews.innerHTML = ''
+                setLoading(true)
                 try {
                     const response = await window.electronAPI.collectGeneratePDF()
 
-                    iframe.src = response.pdf
+                    if (response?.status === 'error') {
+                        showToast(response.message, 'error');
+                        containerPreviews.innerHTML = ''
+                        return;
+                    }
 
+                    containerPreviews.innerHTML = ''
+                    iframe.src = response.pdf
                     containerPreviews.appendChild(iframe)
                 } catch (error) {
-                    console.log(error)
+                    showToast(error.message, 'error')
+                    containerPreviews.innerHTML = ''
+                } finally {
+                    setLoading(false)
                 }
             })
 
@@ -137,18 +159,25 @@
                 const year = document.getElementById('year').value || (new Date().getFullYear() + 1)
                 const collectorName = document.getElementById('collector-name').value || 'Caglieris, Carla'
 
-                containerPreviews.innerHTML = ''
-
-                console.log(price)
+                setLoading(true)
 
                 try {
                     const response = await window.electronAPI.generatePDF({ collect, all, year, price, collectorName })
 
-                    iframe.src = response.pdf
+                    if (response?.status === 'error') {
+                        showToast(response.message, 'error');
+                        containerPreviews.innerHTML = ''
+                        return;
+                    }
 
+                    containerPreviews.innerHTML = ''
+                    iframe.src = response.pdf
                     containerPreviews.appendChild(iframe)
                 } catch (error) {
-                    console.log(error)
+                    showToast(error.message, 'error')
+                    containerPreviews.innerHTML = ''
+                } finally {
+                    setLoading(false)
                 }
             }
 

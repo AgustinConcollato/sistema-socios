@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="../scripts/toast.js"></script>
 </head>
 
 <body style="padding: 20px;">
@@ -39,12 +42,30 @@
 
             formPauseSubscriber.onsubmit = async (e) => {
                 e.preventDefault()
+
+                const btnSubmit = e.target.querySelector('button[type="submit"]')
+                const submitText = btnSubmit.innerHTML
+
+                btnCancel.disabled = true
+                btnSubmit.disabled = true
+                btnSubmit.innerHTML = '<span class="loading-sm"></span> Dando de baja...'
+
                 try {
                     const response = await window.electronAPI.cancelPartner(partner)
+
+                    if (response.status === 'error') {
+                        showToast(response.message, 'error');
+                        return;
+                    }
+
                     window.electronAPI.notifyPartnerListUpdate(response.partner);
                     window.close()
                 } catch (error) {
-
+                    showToast(error.message, 'error');
+                } finally {
+                    btnCancel.disabled = false
+                    btnSubmit.disabled = false
+                    btnSubmit.innerHTML = submitText
                 }
             }
 

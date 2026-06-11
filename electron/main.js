@@ -2,6 +2,8 @@ const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const { ipcMain } = require('electron/main');
 
+if (require('electron-squirrel-startup')) app.quit();
+
 function createWindow() {
     Menu.setApplicationMenu(null);
 

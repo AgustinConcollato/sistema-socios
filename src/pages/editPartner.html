@@ -7,6 +7,9 @@
     <title></title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="./css/editPartner.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="../scripts/toast.js"></script>
 </head>
 
 <body>
@@ -64,14 +67,30 @@
                     formObject[key] = value == '' ? null : value;
                 });
 
+                const btnSubmit = e.target.querySelector('.btn-edit')
+                const btnCancel = e.target.querySelector('#btn-cancel')
+                const submitText = btnSubmit.innerHTML
+
+                btnSubmit.disabled = true
+                btnCancel.disabled = true
+                btnSubmit.innerHTML = '<span class="loading-sm"></span> Editando...'
+
                 try {
                     const response = await window.electronAPI.editPartner({ id: partner.id, updateData: formObject })
-                    if (response.status == 'success') {
-                        window.electronAPI.notifyPartnerListUpdate(formObject);
-                        window.close()
-                    }
-                } catch (error) {
 
+                    if (response.status === 'error') {
+                        showToast(response.message, 'error');
+                        return;
+                    }
+
+                    window.electronAPI.notifyPartnerListUpdate(formObject);
+                    window.close()
+                } catch (error) {
+                    showToast(error.message, 'error');
+                } finally {
+                    btnSubmit.disabled = false
+                    btnCancel.disabled = false
+                    btnSubmit.innerHTML = submitText
                 }
             }
 
